@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>革新版中奖揭晓盛典形态 · CSS 创新概念方案</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --gold-100: #fef9c3;
+      --gold-200: #fef08a;
+      --gold-300: #fde047;
+      --gold-400: #facc15;
+      --gold-500: #eab308;
+      --gold-600: #ca8a04;
+      --gold-gradient: linear-gradient(135deg, #fff7ed 0%, #fef08a 25%, #d97706 70%, #78350f 100%);
+      --gold-sheen: linear-gradient(110deg, #b45309 0%, #fef08a 25%, #fff 50%, #fef08a 75%, #b45309 100%);
+      --crimson-velvet: radial-gradient(circle at 50% 20%, #3b0717 0%, #20040d 60%, #0d0105 100%);
+      --crimson-dark: #140308;
+    }
+
+    body {
+      background: #060209;
+      color: #fff;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Cosmic Galaxy Background Simulation (Matching G2) */
+    .galaxy-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: 
+        radial-gradient(ellipse 90% 55% at 50% -10%, rgba(139, 92, 246, 0.28), transparent 70%),
+        radial-gradient(ellipse 70% 50% at 85% 80%, rgba(244, 63, 94, 0.22), transparent 70%),
+        radial-gradient(ellipse 60% 40% at 15% 45%, rgba(245, 158, 11, 0.18), transparent 60%),
+        radial-gradient(circle at 50% 50%, #150519 0%, #09020d 60%, #030005 100%);
+    }
+
+    .stars-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: 
+        radial-gradient(1.5px 1.5px at 20px 30px, #fef08a, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 150px 180px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 320px 90px, #f43f5e, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 450px 240px, #a855f7, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 600px 350px, #facc15, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 800px 120px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 980px 280px, #38bdf8, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 1200px 150px, #fef08a, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 1400px 320px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 1700px 200px, #f43f5e, rgba(0,0,0,0));
+      background-size: 550px 550px;
+      opacity: 0.65;
+    }
+
+    /* Top Page Header */
+    .top-nav {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 36px 20px 20px;
+    }
+    .top-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fef08a;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .top-title {
+      font-family: 'Cinzel', serif;
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff 0%, #fef08a 40%, #f59e0b 80%, #e11d48 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .top-desc {
+      font-size: 15px;
+      color: #fed7aa;
+      max-width: 820px;
+      margin: 0 auto 30px;
+      line-height: 1.6;
+    }
+
+    /* Concept Selector Tabs */
+    .tab-bar {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+      z-index: 10;
+      margin-bottom: 40px;
+    }
+    .tab-btn {
+      padding: 12px 26px;
+      background: rgba(20, 5, 12, 0.7);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      color: #fbd5c3;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tab-btn:hover {
+      border-color: #f59e0b;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(225, 29, 72, 0.35), rgba(245, 158, 11, 0.35));
+      border: 1.5px solid #fef08a;
+      color: #fff;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.35);
+    }
+    .tab-btn .badge-pill {
+      background: #f59e0b;
+      color: #1a050b;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-weight: 900;
+    }
+
+    /* Showcase Stage Container */
+    .showcase-area {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 640px;
+      padding: 20px 20px 80px;
+    }
+
+    .concept-card {
+      display: none;
+      animation: cardFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .concept-card.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .showcase-area.all-mode {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 24px;
+      max-width: 1860px;
+      margin: 0 auto;
+      padding: 20px 10px 80px;
+    }
+    .showcase-area.all-mode .concept-card {
+      display: flex !important;
+      opacity: 1 !important;
+      transform: scale(0.82);
+      transform-origin: top center;
+      margin: 0 -15px;
+    }
+    .showcase-area.all-mode .ticket-container {
+      width: 680px;
+    }
+    .showcase-area.all-mode .medallion-container {
+      width: 440px;
+    }
+    .showcase-area.all-mode .monolith-container {
+      width: 460px;
+    }
+
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: scale(0.94) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ==============================================================
+       CONCEPT 1: 纵向 3D 浮空皇家授勋金牌 (The 3D Royal Gala Medallion)
+       ============================================================== */
+    .medallion-container {
+      position: relative;
+      width: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      perspective: 1000px;
+    }
+
+    /* Top Hanging Royal Ribbon */
+    .royal-ribbon {
+      position: absolute;
+      top: -46px;
+      z-index: 1;
+      width: 140px;
+      height: 70px;
+      display: flex;
+      justify-content: center;
+    }
+    .ribbon-stripe {
+      width: 38px;
+      height: 75px;
+      background: linear-gradient(180deg, #7f1d1d 0%, #b91c1c 50%, #450a0a 100%);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .ribbon-stripe::after {
+      content: '';
+      position: absolute;
+      left: 6px; right: 6px; top: 0; bottom: 0;
+      border-left: 2px solid #fef08a;
+      border-right: 2px solid #fef08a;
+      opacity: 0.7;
+    }
+    .ribbon-stripe.left {
+      transform: rotate(-12deg) translateY(-4px);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+    }
+    .ribbon-stripe.right {
+      transform: rotate(12deg) translateY(-4px);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+    }
+
+    /* Main Shield/Plaque */
+    .medallion-card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      background: var(--crimson-velvet);
+      border-radius: 36px 36px 48px 48px;
+      padding: 60px 36px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      box-shadow: 
+        0 30px 80px rgba(0, 0, 0, 0.9),
+        0 0 50px rgba(225, 29, 72, 0.3),
+        inset 0 0 40px rgba(245, 158, 11, 0.12);
+    }
+    .medallion-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 38px 38px 50px 50px;
+      padding: 2px;
+      background: linear-gradient(160deg, #fff7ed, #fef08a 25%, #d97706 60%, #450a0a 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Top Wax Crest Seal */
+    .crest-seal {
+      position: absolute;
+      top: -36px;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: conic-gradient(from 45deg, #d97706, #fef08a, #b45309, #fff, #d97706);
+      padding: 3px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8), 0 0 20px rgba(245, 158, 11, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+    }
+    .crest-seal-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #991b1b, #450a0a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fef08a;
+      font-size: 26px;
+      border: 1px solid rgba(254, 240, 138, 0.6);
+    }
+
+    /* Medallion Avatar with Laurel Ring */
+    .medallion-avatar-wrap {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .avatar-laurel-svg {
+      position: absolute;
+      inset: -22px;
+      width: calc(100% + 44px);
+      height: calc(100% + 44px);
+      pointer-events: none;
+      filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.7));
+    }
+    .medallion-avatar-frame {
+      width: 138px;
+      height: 138px;
+      border-radius: 50%;
+      background: conic-gradient(from 120deg, #d97706, #fff, #fef08a, #92400e, #fff, #d97706);
+      padding: 4px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 25px rgba(245, 158, 11, 0.4);
+    }
+    .medallion-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      border: 2px solid #20040d;
+    }
+    .avatar-star-tag {
+      position: absolute;
+      bottom: -6px;
+      background: linear-gradient(135deg, #fef08a, #d97706);
+      color: #2b040e;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 12px;
+      border-radius: 999px;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      border: 1px solid #fff;
+    }
+
+    /* Winner Title & Name */
+    .ceremony-status {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #facc15;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ceremony-status::before, .ceremony-status::after {
+      content: '—';
+      color: rgba(245, 158, 11, 0.4);
+    }
+    .winner-name-gala {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      line-height: 1.15;
+      background: linear-gradient(180deg, #ffffff 0%, #fef08a 45%, #f59e0b 80%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.8));
+    }
+    .winner-meta-chips {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .meta-chip {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: #fed7aa;
+      font-weight: 600;
+    }
+    .meta-chip.strong {
+      color: #fef08a;
+      border-color: rgba(254, 240, 138, 0.4);
+      background: rgba(225, 29, 72, 0.2);
+    }
+
+    /* Embossed Gold Decree Prize Bar */
+    .decree-prize-box {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(225, 29, 72, 0.15));
+      border: 1px solid rgba(254, 240, 138, 0.4);
+      border-radius: 18px;
+      padding: 16px 20px;
+      position: relative;
+      margin-bottom: 12px;
+      box-shadow: inset 0 0 20px rgba(245, 158, 11, 0.1);
+    }
+    .decree-prize-box::before {
+      content: '✦ AWARD DECREE · 授勋盛典 ✦';
+      position: absolute;
+      top: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #25040f;
+      color: #facc15;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      padding: 1px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(250, 204, 21, 0.4);
+      white-space: nowrap;
+    }
+    .decree-prize-tier {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fef08a;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .decree-prize-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+    }
+
+    /* Floating Capsule Dock (Buttons underneath) */
+    .capsule-dock {
+      margin-top: 20px;
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 12px;
+      background: rgba(18, 4, 10, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 999px;
+      padding: 6px 10px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 25px rgba(245, 158, 11, 0.2);
+      backdrop-filter: blur(16px);
+    }
+    .dock-primary-btn {
+      background: linear-gradient(135deg, #fef08a 0%, #f59e0b 60%, #b45309 100%);
+      color: #1e050b;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+      transition: all 0.2s ease;
+    }
+    .dock-primary-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 6px 22px rgba(254, 240, 138, 0.6);
+    }
+    .dock-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fed7aa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+    .dock-icon-btn:hover {
+      background: rgba(245, 158, 11, 0.25);
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    /* ==============================================================
+       CONCEPT 2: 3D 烫金全息典藏金票券 (The 3D Holographic VIP Golden Ticket)
+       ============================================================== */
+    .ticket-container {
+      position: relative;
+      width: 840px;
+      perspective: 1200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .vip-ticket {
+      width: 100%;
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      background: var(--crimson-velvet);
+      border-radius: 28px;
+      overflow: hidden;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      box-shadow: 
+        0 35px 90px rgba(0, 0, 0, 0.95),
+        0 0 50px rgba(225, 29, 72, 0.35);
+      transition: transform 0.4s ease;
+    }
+    .vip-ticket:hover {
+      transform: rotateY(-3deg) rotateX(2deg) translateY(-4px);
+    }
+
+    /* Holographic Foil Overlay */
+    .vip-ticket::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 20%, rgba(254, 240, 138, 0.18) 40%, rgba(244, 63, 94, 0.18) 55%, transparent 75%);
+      background-size: 200% 200%;
+      animation: holoSheen 6s linear infinite;
+      pointer-events: none;
+      z-index: 3;
+    }
+    @keyframes holoSheen {
+      0% { background-position: -150% 0; }
+      100% { background-position: 250% 0; }
+    }
+
+    /* Guilloche Pattern Background */
+    .ticket-main {
+      padding: 36px 36px 30px;
+      position: relative;
+      z-index: 2;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 40%),
+        repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.02) 0px, rgba(245, 158, 11, 0.02) 2px, transparent 2px, transparent 12px);
+    }
+    .ticket-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+      padding-bottom: 14px;
+    }
+    .ticket-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ticket-brand-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #fef08a;
+      letter-spacing: 2px;
+    }
+    .ticket-serial {
+      font-family: monospace;
+      font-size: 12px;
+      color: #f59e0b;
+      letter-spacing: 1px;
+      border: 1px dashed rgba(245, 158, 11, 0.5);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .ticket-body-grid {
+      display: flex;
+      gap: 26px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    /* Photo with Vintage Gold Corner Brackets */
+    .photo-bracket-frame {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      flex-shrink: 0;
+      padding: 6px;
+      background: #140308;
+    }
+    .photo-bracket-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      display: block;
+    }
+    .corner-bracket {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-color: #fef08a;
+      border-style: solid;
+      pointer-events: none;
+    }
+    .corner-bracket.tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+    .corner-bracket.tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+    .corner-bracket.bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+    .corner-bracket.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+    .ticket-info {
+      flex: 1;
+    }
+    .ticket-winner-badge {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: #facc15;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    .ticket-winner-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff, #fef08a 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+      line-height: 1.1;
+    }
+    .ticket-dept {
+      font-size: 13px;
+      color: #fed7aa;
+      margin-bottom: 12px;
+    }
+    .ticket-prize-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+    .ticket-prize-badge .tier {
+      color: #fef08a;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .ticket-prize-badge .pname {
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Bottom Micro Barcode */
+    .ticket-bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid rgba(245, 158, 11, 0.15);
+      padding-top: 14px;
+    }
+    .barcode-lines {
+      height: 28px;
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      opacity: 0.7;
+    }
+    .b-bar {
+      background: #facc15;
+      width: 2px;
+      height: 100%;
+    }
+    .b-bar.w2 { width: 4px; }
+    .b-bar.w3 { width: 6px; }
+    .b-bar.s { height: 75%; }
+    .ticket-security-note {
+      font-size: 11px;
+      color: #fed7aa;
+      opacity: 0.6;
+      letter-spacing: 1px;
+    }
+
+    /* Right Tear-off Stub */
+    .ticket-stub {
+      position: relative;
+      background: rgba(22, 4, 11, 0.95);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      border-left: 2px dashed rgba(245, 158, 11, 0.4);
+    }
+    /* Semicircular Notches at top and bottom of perforated line */
+    .stub-notch-top {
+      position: absolute;
+      top: -14px;
+      left: -14px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #060209;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      box-shadow: inset 0 -4px 6px rgba(0,0,0,0.8);
+      z-index: 5;
+    }
+    .stub-notch-bottom {
+      position: absolute;
+      bottom: -14px;
+      left: -14px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #060209;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.8);
+      z-index: 5;
+    .stub-stamp {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 2px dashed #f59e0b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fef08a;
+      transform: rotate(-12deg);
+      margin-bottom: 8px;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+    }
+    .stub-stamp-txt {
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+    }
+    .stub-details {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+    }
+    .stub-claim-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fef08a;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+      padding-bottom: 4px;
+      width: 100%;
+    }
+    .stub-tkt-num {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #f59e0b;
+      letter-spacing: 1.5px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 6px;
+      padding: 4px 8px;
+    }
+    .stub-meta-row {
+      font-size: 10px;
+      color: #fed7aa;
+      opacity: 0.75;
+      letter-spacing: 1px;
+      line-height: 1.5;
+    }
+    .stub-hologram-seal {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: conic-gradient(from 45deg, #fef08a, #d97706, #fff, #b45309, #fef08a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+    .stub-hologram-seal-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #25040f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fef08a;
+      font-size: 16px;
+    }
+
+    /* ==============================================================
+       CONCEPT 3: 全息盛典水晶方尖碑 (The Holographic Crystal Monolith)
+       ============================================================== */
+    .monolith-container {
+      position: relative;
+      width: 520px;
+      perspective: 1000px;
+    }
+    .crystal-monolith {
+      position: relative;
+      background: linear-gradient(175deg, rgba(45, 6, 18, 0.95) 0%, rgba(18, 3, 8, 0.98) 100%);
+      clip-path: polygon(
+        36px 0, 
+        calc(100% - 36px) 0, 
+        100% 36px, 
+        100% calc(100% - 44px), 
+        calc(100% - 44px) 100%, 
+        44px 100%, 
+        0 calc(100% - 44px), 
+        0 36px
+      );
+      padding: 50px 40px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 
+        0 40px 100px rgba(0,0,0,0.95),
+        0 0 60px rgba(245, 158, 11, 0.25);
+      border: 2px solid rgba(245, 158, 11, 0.4);
+    }
+
+    /* Ambient Spotlight Ray */
+    .monolith-light-beam {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 380px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(254, 240, 138, 0.22), transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Side Laser Ribbons */
+    .side-laser-rail {
+      position: absolute;
+      left: 14px;
+      top: 60px;
+      bottom: 60px;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, #f59e0b 20%, #fef08a 50%, #f59e0b 80%, transparent);
+      box-shadow: 0 0 8px #f59e0b;
+    }
+    .side-laser-rail.right {
+      left: auto;
+      right: 14px;
+    }
+
+    /* Monolith Octagon Avatar Frame */
+    .monolith-avatar-hex {
+      position: relative;
+      z-index: 2;
+      width: 148px;
+      height: 148px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .monolith-hex-border {
+      width: 100%;
+      height: 100%;
+      background: conic-gradient(from 30deg, #fef08a, #d97706, #fff, #b45309, #fef08a);
+      clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.5));
+    }
+    .monolith-hex-inner {
+      width: 100%;
+      height: 100%;
+      background: #140308;
+      clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+      overflow: hidden;
+    }
+    .monolith-hex-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .monolith-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: #facc15;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+    .monolith-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      font-weight: 800;
+      background: linear-gradient(180deg, #ffffff 0%, #fef08a 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      z-index: 2;
+    }
+    .monolith-dept {
+      font-size: 14px;
+      color: #fed7aa;
+      margin-bottom: 24px;
+      z-index: 2;
+    }
+
+    /* Pedestal Base Display */
+    .monolith-pedestal {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: inset 0 0 15px rgba(245, 158, 11, 0.08);
+    }
+    .pedestal-tier {
+      font-size: 11px;
+      color: #fef08a;
+      letter-spacing: 2px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .pedestal-prize {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .monolith-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      z-index: 2;
+    }
+    .monolith-btn {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .monolith-btn.primary {
+      background: linear-gradient(135deg, #fef08a, #f59e0b);
+      color: #1a040b;
+      border: none;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    }
+    .monolith-btn.secondary {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fed7aa;
+    }
+
+    /* Bottom Comparison Explanation */
+    .footer-notes {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      margin: 0 auto 60px;
+      background: rgba(20, 4, 11, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 20px;
+      padding: 28px 36px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      backdrop-filter: blur(12px);
+    }
+    .footer-notes h3 {
+      color: #fef08a;
+      font-size: 18px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 14px;
+    }
+    .compare-col {
+      background: rgba(245, 158, 11, 0.04);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .col-title {
+      font-weight: 800;
+      color: #fef08a;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .col-desc {
+      font-size: 13px;
+      color: #fed7aa;
+      line-height: 1.6;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="galaxy-bg"></div>
+  <div class="stars-layer"></div>
+
+  <div class="top-nav">
+    <div class="top-badge">✦ CSS Architecture Redesign · 论坛革新灵感 ✦</div>
+    <h1 class="top-title">打破千篇一律模板 · 典礼级中奖揭晓三大形态</h1>
+    <p class="top-desc">
+      彻底告别“横向黑色大方盒 + 左右头像名字 + 底部横排四个按钮”的传统弹窗模式！<br>
+      参考 CodePen 3D 典礼勋章、全息烫金打孔入场券、全息水晶方尖碑等高端 CSS 设计语言，打造真正具备盛典仪式感的视觉结构。
+    </p>
+  </div>
+
+  <!-- Interactive Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchConcept(1)">
+      <span>🥇 形态 1：3D 浮空皇家授勋金牌</span>
+      <span class="badge-pill">推荐首选</span>
+    </button>
+    <button class="tab-btn" onclick="switchConcept(2)">
+      <span>🎫 形态 2：3D 烫金全息典藏金票券</span>
+      <span class="badge-pill">VIP入场券</span>
+    </button>
+    <button class="tab-btn" onclick="switchConcept(3)">
+      <span>💎 形态 3：全息盛典水晶方尖碑</span>
+      <span class="badge-pill">领奖台棱镜</span>
+    </button>
+    <button class="tab-btn" onclick="switchConcept('all')">
+      <span>👀 三大多维形态全景并排对比</span>
+      <span class="badge-pill" style="background:#ef4444; color:#fff;">横向并览</span>
+    </button>
+  </div>
+
+  <!-- Showcase Area -->
+  <div class="showcase-area">
+
+    <!-- CONCEPT 1 -->
+    <div id="concept-1" class="concept-card active">
+      <div class="medallion-container">
+        
+        <!-- Royal Silk Ribbon behind -->
+        <div class="royal-ribbon">
+          <div class="ribbon-stripe left"></div>
+          <div class="ribbon-stripe right"></div>
+        </div>
+
+        <!-- Plaque Body -->
+        <div class="medallion-card">
+          <!-- Top Wax Crest Seal -->
+          <div class="crest-seal">
+            <div class="crest-seal-inner">★</div>
+          </div>
+
+          <!-- Avatar with 3D Laurel Ring -->
+          <div class="medallion-avatar-wrap">
+            <svg class="avatar-laurel-svg" viewBox="0 0 200 200" fill="none">
+              <defs>
+                <linearGradient id="laurelGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fff" />
+                  <stop offset="25%" stop-color="#fef08a" />
+                  <stop offset="70%" stop-color="#f59e0b" />
+                  <stop offset="100%" stop-color="#b45309" />
+                </linearGradient>
+              </defs>
+              <!-- Left Laurel Branch -->
+              <path d="M 90,175 C 45,170 20,135 22,95 C 24,60 50,30 90,20" stroke="url(#laurelGold)" stroke-width="2.5" fill="none"/>
+              <path d="M 28,125 Q 15,115 22,98 Q 32,105 28,125 Z" fill="url(#laurelGold)"/>
+              <path d="M 23,100 Q 12,85 22,70 Q 30,80 23,100 Z" fill="url(#laurelGold)"/>
+              <path d="M 27,75 Q 20,58 35,46 Q 40,60 27,75 Z" fill="url(#laurelGold)"/>
+              <path d="M 42,50 Q 40,32 58,26 Q 60,42 42,50 Z" fill="url(#laurelGold)"/>
+              <path d="M 64,30 Q 68,16 88,18 Q 84,32 64,30 Z" fill="url(#laurelGold)"/>
+              <!-- Right Laurel Branch -->
+              <path d="M 110,175 C 155,170 180,135 178,95 C 176,60 150,30 110,20" stroke="url(#laurelGold)" stroke-width="2.5" fill="none"/>
+              <path d="M 172,125 Q 185,115 178,98 Q 168,105 172,125 Z" fill="url(#laurelGold)"/>
+              <path d="M 177,100 Q 188,85 178,70 Q 170,80 177,100 Z" fill="url(#laurelGold)"/>
+              <path d="M 173,75 Q 180,58 165,46 Q 160,60 173,75 Z" fill="url(#laurelGold)"/>
+              <path d="M 158,50 Q 160,32 142,26 Q 140,42 158,50 Z" fill="url(#laurelGold)"/>
+              <path d="M 136,30 Q 132,16 112,18 Q 116,32 136,30 Z" fill="url(#laurelGold)"/>
+              <!-- Top Star Cluster -->
+              <polygon points="100,6 103,14 112,15 105,21 107,29 100,24 93,29 95,21 88,15 97,14" fill="#fff" filter="drop-shadow(0 0 6px #fef08a)"/>
+            </svg>
+            <div class="medallion-avatar-frame">
+              <img class="medallion-avatar-img" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=256&q=80" alt="Olivia Bennett">
+            </div>
+            <div class="avatar-star-tag">WINNER 2026</div>
+          </div>
+
+          <div class="ceremony-status">SPECIAL ANNUAL CEREMONY</div>
+          <div class="winner-name-gala">Olivia Bennett</div>
+          
+          <div class="winner-meta-chips">
+            <div class="meta-chip strong">工号: EMP-1490</div>
+            <div class="meta-chip">People & Culture (HR)</div>
+            <div class="meta-chip">奖券: #1490</div>
+          </div>
+
+          <!-- Embossed Decree Box -->
+          <div class="decree-prize-box">
+            <div class="decree-prize-tier">特等奖 · GRAND PRIZE</div>
+            <div class="decree-prize-name">Apple MacBook Pro 16" M3 Max</div>
+          </div>
+
+        </div>
+
+        <!-- Floating Satellite Capsule Dock -->
+        <div class="capsule-dock">
+          <button class="dock-primary-btn">
+            <span>🏆 确认授勋入册</span>
+          </button>
+          <button class="dock-icon-btn" title="打印荣誉证书">🖨️</button>
+          <button class="dock-icon-btn" title="查看部门名单">👥</button>
+          <button class="dock-icon-btn" title="继续下一轮">✨</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONCEPT 2 -->
+    <div id="concept-2" class="concept-card">
+      <div class="ticket-container">
+        <div class="vip-ticket">
+          
+          <!-- Left Ticket Body -->
+          <div class="ticket-main">
+            <div class="ticket-header-row">
+              <div class="ticket-brand">
+                <span style="font-size: 20px;">✦</span>
+                <span class="ticket-brand-logo">ANNUAL GALA VIP PASS</span>
+              </div>
+              <div class="ticket-serial">NO. 2026-GALA-001</div>
+            </div>
+
+            <div class="ticket-body-grid">
+              <div class="photo-bracket-frame">
+                <div class="corner-bracket tl"></div>
+                <div class="corner-bracket tr"></div>
+                <div class="corner-bracket bl"></div>
+                <div class="corner-bracket br"></div>
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=256&q=80" alt="Olivia Bennett">
+              </div>
+
+              <div class="ticket-info">
+                <div class="ticket-winner-badge">OFFICIAL WINNER ADMISSION</div>
+                <div class="ticket-winner-name">Olivia Bennett</div>
+                <div class="ticket-dept">EMPLOYEE ID: EMP-1490 · PEOPLE &amp; CULTURE (HR)</div>
+                <div class="ticket-prize-badge">
+                  <span class="tier">【GRAND PRIZE】</span>
+                  <span class="pname">Apple MacBook Pro 16" M3 Max</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ticket-bottom-bar">
+              <div class="barcode-lines">
+                <div class="b-bar"></div><div class="b-bar w2"></div><div class="b-bar s"></div><div class="b-bar w3"></div>
+                <div class="b-bar"></div><div class="b-bar w2 s"></div><div class="b-bar"></div><div class="b-bar w3"></div>
+                <div class="b-bar s"></div><div class="b-bar"></div><div class="b-bar w2"></div><div class="b-bar"></div>
+                <div class="b-bar w3 s"></div><div class="b-bar"></div><div class="b-bar"></div><div class="b-bar w2"></div>
+                <div class="b-bar s"></div><div class="b-bar w3"></div><div class="b-bar"></div><div class="b-bar w2"></div>
+              </div>
+              <div class="ticket-security-note">★ ANTI-COUNTERFEITING HOLOGRAM SEALED ★</div>
+            </div>
+          </div>
+
+          <!-- Right Tear-Off Stub -->
+          <div class="ticket-stub">
+            <div class="stub-notch-top"></div>
+            <div class="stub-notch-bottom"></div>
+
+            <div class="stub-stamp">
+              <span style="font-size: 16px;">★</span>
+              <span class="stub-stamp-txt">VERIFIED</span>
+              <span style="font-size: 8px; opacity: 0.85; letter-spacing: 1px;">2026 GALA</span>
+            </div>
+
+            <div class="stub-details">
+              <div class="stub-claim-title">OFFICIAL CLAIM STUB</div>
+              <div class="stub-tkt-num">TKT-2026-1490</div>
+              <div class="stub-meta-row">
+                ADMIT ONE · WINNER<br>
+                DATE: 2026.09.29<br>
+                VENUE: CELESTIAL HALL
+              </div>
+              <div class="stub-hologram-seal">
+                <div class="stub-hologram-seal-inner">✦</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Floating Satellite Capsule Control Dock Outside Ticket -->
+        <div class="capsule-dock" style="margin-top: 22px;">
+          <button class="dock-primary-btn">
+            <span>🏆 CLAIM &amp; ISSUE REWARD</span>
+          </button>
+          <button class="dock-icon-btn" title="Print VIP Golden Ticket">🖨️</button>
+          <button class="dock-icon-btn" title="View Department Roster">👥</button>
+          <button class="dock-icon-btn" title="Draw Next Round">✨</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 3 -->
+    <div id="concept-3" class="concept-card">
+      <div class="monolith-container">
+        
+        <div class="crystal-monolith">
+          <div class="monolith-light-beam"></div>
+          <div class="side-laser-rail"></div>
+          <div class="side-laser-rail right"></div>
+
+          <!-- Octagon Avatar -->
+          <div class="monolith-avatar-hex">
+            <div class="monolith-hex-border">
+              <div class="monolith-hex-inner">
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=256&q=80" alt="Olivia Bennett">
+              </div>
+            </div>
+          </div>
+
+          <div class="monolith-tag">✦ LAUREATE OF EXCELLENCE ✦</div>
+          <div class="monolith-name">Olivia Bennett</div>
+          <div class="monolith-dept">EMP-1490 · People & Culture (HR)</div>
+
+          <!-- Pedestal Base -->
+          <div class="monolith-pedestal">
+            <div class="pedestal-tier">★ ANNUAL GRAND PRIZE ★</div>
+            <div class="pedestal-prize">MacBook Pro 16" M3 Max</div>
+          </div>
+
+          <div class="monolith-actions">
+            <button class="monolith-btn primary">荣誉授奖</button>
+            <button class="monolith-btn secondary">打印铭牌</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Explanatory Grid -->
+  <div class="footer-notes">
+    <h3>💡 论坛与现代 CSS 创新突破点分析</h3>
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="col-title">形态 1：3D 皇家授勋金牌</div>
+        <div class="col-desc">
+          打破传统弹窗盒子！采用<b>纵向仪式盾形轮廓</b>，顶部搭配高饱和度典礼暗红真丝垂坠织带与 3D 浮雕印戳。头像采用<b>月桂花环浮空金圈</b>，按钮完全解耦为<b>底部悬浮磁吸胶囊</b>，极具欧陆皇室授勋盛典庄严感。
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="col-title">形态 2：3D 烫金全息典藏金票券</div>
+        <div class="col-desc">
+          灵感来自 CodePen 经典 3D 全息卡牌与金票（Golden Ticket）。具备<b>双联物理打孔撕口与半圆凹口</b>，采用钞券几何防伪底纹、四角金属复古相框卡角、微缩条形码与右侧独立核销副券，让中奖者感觉真正获得一张无价的实体金票。
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="col-title">形态 3：全息水晶方尖碑</div>
+        <div class="col-desc">
+          灵感来自 Awwwards 前沿棱镜折射设计。放弃所有圆角矩形，采用 <b>45度切角晶体多边形外廓（Clip-path）</b>，搭配全息光柱、侧边垂直激光导轨与黑曜石合金领奖台基座，宛如将奥斯卡/时代奖杯直接搬到屏幕中央。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchConcept(mode) {
+      const showcase = document.querySelector('.showcase-area');
+      const tabs = document.querySelectorAll('.tab-btn');
+      const cards = document.querySelectorAll('.concept-card');
+
+      if (mode === 'all') {
+        tabs.forEach((btn, i) => btn.classList.toggle('active', i === 3));
+        showcase.classList.add('all-mode');
+        cards.forEach(c => {
+          c.classList.remove('active');
+          c.style.display = 'flex';
+        });
+      } else {
+        showcase.classList.remove('all-mode');
+        tabs.forEach((btn, i) => btn.classList.toggle('active', i === mode - 1));
+        cards.forEach((card, i) => {
+          card.style.display = '';
+          card.classList.toggle('active', i === mode - 1);
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>

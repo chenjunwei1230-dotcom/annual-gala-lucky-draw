@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annual Gala Awards 2026 — Celestial Firework Lucky Draw</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Space+Grotesk:wght@500;700;800&family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=golden-ticket-b1">
+  <!-- Vue 3 & Local SheetJS Engine (100% Offline Excel Import & Export) -->
+  <script src="vue.global.prod.js"></script>
+  <script src="xlsx.mini.min.js"></script>
+</head>
+<body>
+  <div id="app" v-cloak>
+    <!-- Dedicated Pyrotechnic Dual-Canvas & Confetti Canvas Layers -->
+    <canvas id="firework-trails-canvas" class="firework-fullscreen-canvas firework-trails-layer"></canvas>
+    <canvas id="firework-canvas" class="firework-fullscreen-canvas firework-main-layer"></canvas>
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- G2 Stylized Cosmic Band (Galaxy Colorband) Background System -->
+    <div class="cosmic-nebula-system galaxy-g2-system" :class="{ 'nebula-bursting': fireworkState === 'BURSTING' || fireworkState === 'REVEALED' }">
+      <!-- High-Fidelity G2 Galaxy Colorband Backdrop Texture -->
+      <div class="galaxy-band-texture"></div>
+
+      <!-- Procedural Animated Organic Silk Nebula Glows -->
+      <div class="galaxy-glow-mesh">
+        <div class="galaxy-flow-cloud galaxy-cloud-violet"></div>
+        <div class="galaxy-flow-cloud galaxy-cloud-magenta"></div>
+        <div class="galaxy-flow-cloud galaxy-cloud-teal"></div>
+        <div class="galaxy-flow-cloud galaxy-cloud-amber"></div>
+      </div>
+
+      <!-- Celestial Ambient Stardust & Shooting Stars -->
+      <div class="galaxy-shooting-stars" aria-hidden="true">
+        <div class="shooting-star star-1"></div>
+        <div class="shooting-star star-2"></div>
+        <div class="shooting-star star-3"></div>
+      </div>
+
+      <!-- Anamorphic Vignette to keep fireworks explosion zone high-contrast & clean -->
+      <div class="cosmic-vignette-overlay"></div>
+    </div>
+    <div class="firework-sky-glow" :class="{ 'glow-bursting': fireworkState === 'BURSTING' || fireworkState === 'REVEALED' }"></div>
+
+    <!-- Top Live Stage Broadcast Navigation Bar -->
+    <header class="gala-header">
+      <div class="brand">
+        <span class="gala-emblem">●</span>
+        <div class="brand-text">
+          <span class="eyebrow">LIVE EVENT BROADCAST SYSTEM</span>
+          <h1 class="main-title">MAIN ARENA STAGE DRAW</h1>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Roster & Excel Import Button -->
+        <button class="ghost-btn roster-toggle-btn" @click="openRosterDrawer" title="Manage candidate roster & import Excel / CSV">
+          <span>👥</span>
+          <span class="btn-text">Roster & Excel</span>
+        </button>
+
+        <!-- Winners History Button -->
+        <button class="ghost-btn winners-toggle-btn" @click="openWinnersDrawer" title="View official winners roster & export to Excel">
+          <span>🏆</span>
+          <span class="btn-text">Winners ({{ winnersHistory.length }})</span>
+        </button>
+
+        <!-- Interactive Award Selector Pill -->
+        <div class="award-selector-pill" @click="openAwardModal" title="Click to switch or configure prize tiers">
+          <span class="award-tier-tag">{{ currentAward.title }}</span>
+          <span class="award-prize-text">{{ currentAward.prizeName }}</span>
+          <span class="award-quota-badge" :class="{ 'quota-filled': isAwardFilled(currentAward.id) }">
+            {{ getAwardWinnersCount(currentAward.id) }}/{{ currentAward.quota }}
+          </span>
+          <span class="award-dropdown-arrow">▾</span>
+        </div>
+
+        <!-- Audio Mute Toggle -->
+        <button class="icon-btn" @click="toggleMute" :title="isMuted ? 'Unmute Audio (M)' : 'Mute Audio (M)'">
+          <span v-if="!isMuted">🔊</span>
+          <span v-else>🔇</span>
+          <span class="btn-text">{{ isMuted ? 'Muted' : 'Sound ON' }}</span>
+        </button>
+
+        <!-- Fullscreen Toggle Button -->
+        <button class="icon-btn" @click="toggleFullscreen" :title="isFullscreen ? 'Exit Fullscreen (F)' : 'Enter Fullscreen (F)'">
+          <span>🖥️</span>
+          <span class="btn-text">{{ isFullscreen ? 'Windowed' : 'Fullscreen' }}</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Remaining Candidate Pool Counter Badge -->
+    <div class="pool-badge-wrapper" :class="{ 'banner-hidden': fireworkState !== 'IDLE' }">
+      <div class="pool-badge">
+        <span class="pulse-dot"></span>
+        <span>Eligible Tickets in Pool: <strong>{{ remainingCount }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Main Celestial Firework Stage -->
+    <main class="stage-container firework-stage-container">
+      
+      <!-- Top Celestial Banner -->
+      <div class="celestial-sky-header" :class="{ 'banner-hidden': fireworkState !== 'IDLE' }">
+        <span class="celestial-header-spark">●</span>
+        <span class="celestial-header-title">LIVE EVENT CEREMONY 2026 · MAIN STAGE ARENA</span>
+        <span class="celestial-header-spark">●</span>
+      </div>
+
+      <!-- Center Pyrotechnic Launch Station & Reveal Arena -->
+      <div class="firework-arena">
+
+        <!-- Center Celestial Astrolabe & Constellation Arch (Fills negative space during IDLE) -->
+        <div 
+          class="celestial-astrolabe" 
+          :class="{ 'astrolabe-hidden': fireworkState !== 'IDLE' }"
+        >
+          <div class="astrolabe-compass-ring"></div>
+          <div class="astrolabe-zodiac-ring"></div>
+          <div class="astrolabe-star-axis">
+            <span class="axis-point north">✦</span>
+            <span class="axis-point south">✦</span>
+            <span class="axis-point east">✦</span>
+            <span class="axis-point west">✦</span>
+          </div>
+          <div class="astrolabe-center-disc">
+            <div class="disc-crest">● LIVE ARENA ●</div>
+            <div class="disc-title">STAGE DRAW</div>
+            <div class="disc-sub">TICKET BROADCAST</div>
+          </div>
+        </div>
+
+        <!-- Ground Ceremonial Pyrotechnic Launch Station & Stage Pedestal -->
+        <div 
+          class="firework-launch-station" 
+          :class="{ 
+            'station-igniting': fireworkState === 'IGNITING',
+            'station-firing': fireworkState === 'ASCENDING',
+            'station-sunk': fireworkState === 'ASCENDING' || fireworkState === 'APEX' || fireworkState === 'BURSTING' || fireworkState === 'REVEALED'
+          }"
+        >
+          <!-- Stage Broadcast Sub-Banner -->
+          <div class="pedestal-crest">
+            <span class="crest-spark">●</span>
+            <span>STAGE PYROTECHNIC CONTROL // ARENA 2026</span>
+            <span class="crest-spark">●</span>
+          </div>
+
+          <!-- Launch Station Console Column -->
+          <div class="station-console-column">
+            
+            <!-- Heavy 3D Ceremonial Mortar Tube Assembly -->
+            <div class="mortar-tube-assembly" :class="{ 'mortar-recoil': fireworkState === 'ASCENDING' }">
+              <div class="mortar-bore-glow" :class="{ 'bore-active': fireworkState === 'ASCENDING' }"></div>
+              <div class="mortar-tube-barrel">
+                <div class="mortar-rim" id="mortar-launch-rim">
+                  <div class="rim-inner-bore"></div>
+                </div>
+                <div class="barrel-body">
+                  <div class="barrel-reinforce-ring top-ring"></div>
+                  <div class="barrel-reinforce-ring mid-ring"></div>
+                  <div class="barrel-brass-plate">
+                    <span class="plate-title">TITANIUM SALUTE · 8"</span>
+                    <span class="plate-spec">CLASS 1.3G PYROTECHNIC</span>
+                  </div>
+                </div>
+                <div class="barrel-base-mount"></div>
+              </div>
+            </div>
+
+            <!-- Interconnecting Braided Quickmatch Fuse Conduit -->
+            <div class="pyro-fuse-cable-vertical" :class="{ 'fuse-burning': fireworkState === 'IGNITING' }">
+              <div class="fuse-core-line-vertical"></div>
+              <div class="fuse-spark-head-vertical" v-if="fireworkState === 'IGNITING'">
+                <div class="spark-corona"></div>
+              </div>
+            </div>
+
+            <!-- Batch Draw Count Selector Bar -->
+            <div class="batch-draw-control-bar" :class="{ 'control-disabled': isFireworkActive }">
+              <span class="batch-label">DRAW COUNT:</span>
+              <div class="batch-pill-group">
+                <button 
+                  v-for="count in [1, 2, 5, 10]" 
+                  :key="count" 
+                  class="batch-pill-btn" 
+                  :class="{ 
+                    'batch-active': drawCount === count,
+                    'batch-btn-disabled': count > maxDrawCountAllowed
+                  }"
+                  @click="setDrawCount(count)"
+                  :disabled="isFireworkActive || count > maxDrawCountAllowed"
+                  :title="count > maxDrawCountAllowed ? `Disabled: Exceeds ${currentAward.title} remaining quota (${maxDrawCountAllowed})` : `Select ${count} winner${count > 1 ? 's' : ''}`"
+                >
+                  {{ count }}
+                </button>
+              </div>
+              <div class="batch-custom-wrap" :title="`Max allowed for ${currentAward.title}: ${maxDrawCountAllowed}`">
+                <span class="custom-label">Qty:</span>
+                <input 
+                  type="number" 
+                  min="1" 
+                  :max="maxDrawCountAllowed" 
+                  v-model.number="drawCount" 
+                  @input="clampDrawCount"
+                  @change="clampDrawCount"
+                  class="batch-custom-input"
+                  :disabled="isFireworkActive"
+                />
+              </div>
+              <button 
+                class="batch-quota-btn" 
+                @click="setDrawCountToRemainingQuota"
+                :disabled="isFireworkActive || remainingAwardQuota <= 0"
+                :title="`Fill all remaining slots for ${currentAward.title} (${remainingAwardQuota} remaining)`"
+              >
+                Fill Quota ({{ Math.max(0, remainingAwardQuota) }})
+              </button>
+            </div>
+
+            <!-- Heavy Stage Firing Key / Launch Button -->
+            <div 
+              class="firework-ignite-button" 
+              :class="{ 
+                'btn-igniting': fireworkState === 'IGNITING',
+                'btn-disabled': isFireworkActive || (remainingAwardQuota <= 0 && fireworkState !== 'REVEALED')
+              }"
+              @click="startFireworkLaunch"
+              title="Ignite and launch firework [SPACE]"
+            >
+              <div class="btn-flare-ring"></div>
+              <div class="btn-inner-content">
+                <div class="btn-icon">⚡</div>
+                <div class="btn-headline">
+                  <template v-if="remainingAwardQuota <= 0 && fireworkState === 'IDLE'">
+                    QUOTA FILLED ({{ currentAward.quota }}/{{ currentAward.quota }})
+                  </template>
+                  <template v-else>
+                    IGNITE & LAUNCH {{ drawCount > 1 ? '(' + drawCount + ' WINNERS)' : '' }}
+                  </template>
+                </div>
+                <div class="btn-subtext">
+                  <template v-if="remainingAwardQuota <= 0 && fireworkState === 'IDLE'">
+                    [ SELECT ANOTHER TIER ABOVE ]
+                  </template>
+                  <template v-else>
+                    [ SPACEBAR / CLICK ]
+                  </template>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Gala Grand Stage Pedestal Foundation & Floor Wash -->
+          <div class="gala-stage-pedestal">
+            <div class="pedestal-spotlight-wash"></div>
+            <div class="pedestal-bevel-rim"></div>
+            <div class="pedestal-floor-plinth"></div>
+          </div>
+        </div>
+
+        <!-- LIVE STAGE BROADCAST WINNER REVEAL -->
+        <transition name="stage-reveal-anim">
+          <div v-if="fireworkState === 'REVEALED'" class="live-stage-reveal-screen">
+            
+            <!-- Atmospheric Concert Stage Lighting Beams & Haze Wash -->
+            <div class="stage-spotlight-beam-left"></div>
+            <div class="stage-spotlight-beam-right"></div>
+            <div class="stage-ambient-haze"></div>
+
+            <!-- CASE A: Single Winner VIP Golden Ticket Pass -->
+            <div v-if="fireworkWinners.length === 1" class="ticket-container-B">
+              <div class="ticket-card-B">
+                <div class="holo-sheen"></div>
+
+                <!-- Main Upper Pass -->
+                <div class="ticket-main-B">
+                  <div class="ticket-header-row">
+                    <div class="ticket-brand">
+                      <span class="ticket-spark">✦</span>
+                      <span 
+                        class="ticket-brand-logo editable-title" 
+                        contenteditable="true" 
+                        spellcheck="false"
+                        @blur="ticketConfig.brandTitle = $event.target.innerText.trim()"
+                        title="Click to edit event title"
+                      >{{ ticketConfig.brandTitle }}</span>
+                    </div>
+                    <div class="ticket-serial font-mono">NO. 2026-GALA-{{ fireworkWinners[0] ? (fireworkWinners[0].id.replace(/\D/g, '') || '001') : '001' }}</div>
+                  </div>
+
+                  <div class="ticket-body-grid">
+                    <div class="photo-bracket-frame">
+                      <div class="corner-bracket tl"></div>
+                      <div class="corner-bracket tr"></div>
+                      <div class="corner-bracket bl"></div>
+                      <div class="corner-bracket br"></div>
+                      <img v-if="fireworkWinners[0] && fireworkWinners[0].avatar" :src="fireworkWinners[0].avatar" :alt="fireworkWinners[0].name" />
+                      <div v-else class="stage-avatar-fallback">{{ getInitials(fireworkWinners[0] ? fireworkWinners[0].name : '') }}</div>
+                    </div>
+
+                    <div class="ticket-info">
+                      <div 
+                        class="ticket-winner-badge editable-title"
+                        contenteditable="true"
+                        spellcheck="false"
+                        @blur="ticketConfig.admissionEyebrow = $event.target.innerText.trim()"
+                        title="Click to edit admission title"
+                      >{{ ticketConfig.admissionEyebrow }}</div>
+                      <h1 class="ticket-winner-name">{{ fireworkWinners[0] ? fireworkWinners[0].name : '' }}</h1>
+                      <div class="ticket-dept">
+                        EMPLOYEE ID: {{ fireworkWinners[0] ? fireworkWinners[0].id : 'N/A' }} · 
+                        {{ (fireworkWinners[0] ? fireworkWinners[0].department : 'General Admission').toUpperCase() }}
+                      </div>
+                      <div class="ticket-prize-badge">
+                        <span class="tier">【{{ currentAward.title.toUpperCase() }}】</span>
+                        <span class="pname">{{ currentAward.prizeName }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bottom Horizontal Stub (100% Horizontal Layout) -->
+                <div class="ticket-stub-B">
+                  <div class="stub-notch-left"></div>
+                  <div class="stub-notch-right"></div>
+
+                  <div class="stub-b-col-left">
+                    <div class="stub-b-stamp">
+                      <span style="font-size: 11px;">★</span>
+                      <span 
+                        class="stub-b-stamp-text editable-title" 
+                        contenteditable="true" 
+                        spellcheck="false"
+                        @blur="ticketConfig.securityStamp = $event.target.innerText.trim()"
+                        title="Click to edit stamp"
+                      >{{ ticketConfig.securityStamp }}</span>
+                    </div>
+                    <div>
+                      <div 
+                        class="stub-b-title editable-title" 
+                        contenteditable="true" 
+                        spellcheck="false"
+                        @blur="ticketConfig.stubTitle = $event.target.innerText.trim()"
+                        title="Click to edit stub title"
+                      >{{ ticketConfig.stubTitle }}</div>
+                      <div class="stub-b-serial font-mono">TKT-2026-{{ fireworkWinners[0] ? (fireworkWinners[0].id.replace(/\D/g, '') || '1490') : '1490' }} · ADMIT ONE</div>
+                    </div>
+                  </div>
+
+                  <div class="stub-b-col-center">
+                    <span 
+                      class="editable-title" 
+                      contenteditable="true" 
+                      spellcheck="false"
+                      @blur="ticketConfig.eventDate = $event.target.innerText.trim()"
+                      title="Click to edit event date"
+                    >DATE: {{ ticketConfig.eventDate }}</span><br>
+                    <span 
+                      class="editable-title" 
+                      contenteditable="true" 
+                      spellcheck="false"
+                      @blur="ticketConfig.venue = $event.target.innerText.trim()"
+                      title="Click to edit venue"
+                    >VENUE: {{ ticketConfig.venue }}</span>
+                  </div>
+
+                  <div class="stub-b-col-right">
+                    <div class="barcode-lines">
+                      <div class="b-bar"></div><div class="b-bar w2"></div><div class="b-bar s"></div><div class="b-bar w3"></div>
+                      <div class="b-bar"></div><div class="b-bar w2 s"></div><div class="b-bar"></div><div class="b-bar w3"></div>
+                      <div class="b-bar s"></div><div class="b-bar"></div><div class="b-bar w2"></div>
+                    </div>
+                    <div 
+                      class="stub-auth-note editable-title" 
+                      contenteditable="true" 
+                      spellcheck="false"
+                      @blur="ticketConfig.securityBadge = $event.target.innerText.trim()"
+                      title="Click to edit badge"
+                    >{{ ticketConfig.securityBadge }}</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Floating Satellite Capsule Control Dock Outside Ticket -->
+              <div class="capsule-dock">
+                <button class="dock-primary-btn" @click="confirmAndDrawNext" title="Confirm, remove from pool, and draw next [SPACE]">
+                  <span class="btn-live-pulse"></span>
+                  <span>🏆 CLAIM &amp; DRAW NEXT [SPACE]</span>
+                </button>
+                <button class="dock-secondary-btn" @click="confirmAndRemoveWinners" title="Confirm win and remove from candidate pool">
+                  <span>✕ REMOVE FROM POOL</span>
+                </button>
+                <button class="dock-secondary-btn" @click="keepWinnersInPool" title="Confirm win but preserve in pool for future draws">
+                  <span>↺ KEEP IN POOL</span>
+                </button>
+                <button class="dock-icon-btn dock-settings-btn" @click="openAwardModal" title="Customize VIP Ticket Titles & Prize Settings">⚙️</button>
+                <button class="dock-icon-btn" @click="openRosterDrawer" title="View Candidate Roster">👥</button>
+                <button class="dock-icon-btn" @click="closeFireworkModal" title="Close Ticket">✕</button>
+              </div>
+            </div>
+
+            <!-- CASE B: Multi-Winner VIP Golden Ticket Pass -->
+            <div v-else class="ticket-container-B batch-ticket-container">
+              <div class="ticket-card-B batch-ticket-card">
+                <div class="holo-sheen"></div>
+
+                <!-- Main Upper Pass -->
+                <div class="ticket-main-B">
+                  <div class="ticket-header-row">
+                    <div class="ticket-brand">
+                      <span class="ticket-spark">✦</span>
+                      <span 
+                        class="ticket-brand-logo editable-title" 
+                        contenteditable="true" 
+                        spellcheck="false"
+                        @blur="ticketConfig.brandTitle = $event.target.innerText.trim()"
+                        title="Click to edit event title"
+                      >{{ ticketConfig.brandTitle }}</span>
+                    </div>
+                    <div class="ticket-serial font-mono">BATCH PASS // {{ fireworkWinners.length }} WINNERS</div>
+                  </div>
+
+                  <div class="batch-winners-container">
+                    <div class="batch-grid" :class="'grid-' + Math.min(fireworkWinners.length, 5)">
+                      <div 
+                        v-for="(w, idx) in fireworkWinners" 
+                        :key="idx" 
+                        class="batch-winner-item"
+                        :class="{ 'item-kept': w.keepInPool }"
+                      >
+                        <div class="batch-item-rank">#{{ idx + 1 }}</div>
+                        <div class="batch-item-avatar">
+                          <img v-if="w.avatar" :src="w.avatar" class="batch-item-img" />
+                          <div v-else class="batch-item-fallback">{{ getInitials(w.name) }}</div>
+                        </div>
+                        <div class="batch-item-content">
+                          <div class="batch-item-name">{{ w.name }}</div>
+                          <div class="batch-item-meta">
+                            <span class="batch-item-dept">{{ w.department }}</span>
+                            <span class="batch-item-serial font-mono">TKT-{{ w.id.replace(/\D/g, '') || (1000 + idx) }}</span>
+                          </div>
+                        </div>
+                        <button 
+                          class="batch-item-action-btn"
+                          @click="toggleWinnerKeep(idx)"
+                          :title="w.keepInPool ? 'Kept in pool (click to discard)' : 'Will be removed from pool (click to keep)'"
+                        >
+                          <span v-if="!w.keepInPool" class="btn-state-discard">✕ Remove</span>
+                          <span v-else class="btn-state-keep">↺ Keep</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="batch-prize-banner">
+                    <div class="tier">【{{ currentAward.title.toUpperCase() }}】</div>
+                    <div class="pname">{{ currentAward.prizeName }} (Batch of {{ fireworkWinners.length }})</div>
+                  </div>
+                </div>
+
+                <!-- Bottom Horizontal Stub -->
+                <div class="ticket-stub-B">
+                  <div class="stub-notch-left"></div>
+                  <div class="stub-notch-right"></div>
+
+                  <div class="stub-b-col-left">
+                    <div class="stub-b-stamp">
+                      <span style="font-size: 11px;">★</span>
+                      <span class="stub-b-stamp-text">{{ ticketConfig.securityStamp }}</span>
+                    </div>
+                    <div>
+                      <div class="stub-b-title">{{ ticketConfig.stubTitle }}</div>
+                      <div class="stub-b-serial font-mono">BATCH ADMISSION // {{ fireworkWinners.length }} WINNERS AUTHENTICATED</div>
+                    </div>
+                  </div>
+
+                  <div class="stub-b-col-center">
+                    DATE: {{ ticketConfig.eventDate }}<br>
+                    VENUE: {{ ticketConfig.venue }}
+                  </div>
+
+                  <div class="stub-b-col-right">
+                    <div class="barcode-lines">
+                      <div class="b-bar"></div><div class="b-bar w2"></div><div class="b-bar s"></div><div class="b-bar w3"></div>
+                      <div class="b-bar"></div><div class="b-bar w2 s"></div><div class="b-bar"></div><div class="b-bar w3"></div>
+                      <div class="b-bar s"></div><div class="b-bar"></div><div class="b-bar w2"></div>
+                    </div>
+                    <div class="stub-auth-note">{{ ticketConfig.securityBadge }}</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Floating Satellite Capsule Control Dock Outside Ticket -->
+              <div class="capsule-dock">
+                <button class="dock-primary-btn" @click="confirmAndDrawNext" title="Confirm all, remove from pool, and draw next batch [SPACE]">
+                  <span class="btn-live-pulse"></span>
+                  <span>🏆 CLAIM ALL &amp; DRAW NEXT [SPACE]</span>
+                </button>
+                <button class="dock-secondary-btn" @click="confirmAndRemoveWinners" title="Confirm all wins and remove from candidate pool">
+                  <span>✕ REMOVE ALL</span>
+                </button>
+                <button class="dock-secondary-btn" @click="keepWinnersInPool" title="Confirm all wins but preserve in pool">
+                  <span>↺ KEEP ALL</span>
+                </button>
+                <button class="dock-icon-btn dock-settings-btn" @click="openAwardModal" title="Customize VIP Ticket Titles & Prize Settings">⚙️</button>
+                <button class="dock-icon-btn" @click="openRosterDrawer" title="View Candidate Roster">👥</button>
+                <button class="dock-icon-btn" @click="closeFireworkModal" title="Close Ticket">✕</button>
+              </div>
+            </div>
+
+          </div>
+        </transition>
+
+      </div>
+
+      <!-- Footer Prompt -->
+      <footer class="stage-footer">
+        <div v-if="fireworkState === 'IDLE'" class="prompt-box pulse">
+          <span class="key-tag">SPACE</span> or <span class="click-tag" @click="startFireworkLaunch">CLICK IGNITE</span> to Launch Gala Firework
+        </div>
+        <div v-else-if="isFireworkActive" class="prompt-box">
+          <span class="spinner">✦</span> Rocket in Motion...
+        </div>
+      </footer>
+    </main>
+
+    <!-- Candidate Roster & Photo Manager Drawer -->
+    <transition name="drawer-anim">
+      <div v-if="isRosterOpen" class="roster-drawer-backdrop" @click.self="closeRosterDrawer">
+        <aside class="roster-drawer-panel">
+          <div class="drawer-header">
+            <div class="drawer-title-group">
+              <span class="drawer-icon">👥</span>
+              <div>
+                <h2 class="drawer-title">Candidate Roster & Photos</h2>
+                <p class="drawer-subtitle">{{ remainingCount }} Candidates currently loaded</p>
+              </div>
+            </div>
+            <button class="drawer-close-btn" @click="closeRosterDrawer" title="Close Drawer">✕</button>
+          </div>
+
+          <!-- Quick Action Bar -->
+          <div class="drawer-toolbar">
+            <button class="tool-btn excel-tool-btn" @click="triggerExcelImport" title="Import Excel or CSV roster file (.xlsx, .xls, .csv)">
+              <span>📊</span>
+              <span>Import Excel / CSV</span>
+            </button>
+            <button class="tool-btn" @click="shuffleRoster" title="Shuffle candidate order randomly">
+              <span>🔀</span>
+              <span>Shuffle Roster</span>
+            </button>
+            <button class="tool-btn" @click="sortRoster" title="Sort candidates alphabetically">
+              <span>🔤</span>
+              <span>Sort A-Z</span>
+            </button>
+            <button class="tool-btn clear-tool-btn" @click="clearRoster" title="Clear current roster">
+              <span>🗑️</span>
+              <span>Clear Roster</span>
+            </button>
+          </div>
+
+          <div class="drawer-body">
+            <!-- Section 1: Bulk Names Input -->
+            <div class="drawer-section">
+              <div class="section-label-row">
+                <span class="section-label">BULK NAMES (ONE PER LINE)</span>
+                <span class="section-hint">Paste from Excel / Google Sheets</span>
+              </div>
+              <textarea 
+                v-model="bulkNamesText" 
+                class="bulk-names-textarea" 
+                rows="6" 
+                placeholder="Enter one candidate name per line..."
+                @blur="syncBulkNames"
+              ></textarea>
+              <div class="section-actions">
+                <button class="primary-btn sync-btn" @click="syncBulkNames">
+                  <span>✦ UPDATE ROSTER FROM TEXT</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Section 2: Visual Candidate Cards with Photo Uploader -->
+            <div class="drawer-section">
+              <div class="section-label-row">
+                <span class="section-label">EMPLOYEE CARDS & CUSTOM PHOTOS</span>
+                <span class="section-hint">Click photo or camera icon to upload custom image</span>
+              </div>
+
+              <div class="candidate-cards-scroll">
+                <div 
+                  v-for="(cand, cIdx) in candidatePool" 
+                  :key="cand.id" 
+                  class="candidate-card-item"
+                >
+                  <div 
+                    class="cand-photo-thumb" 
+                    @click="triggerPhotoUploadForIndex(cIdx)" 
+                    title="Click to upload custom photo"
+                  >
+                    <img v-if="cand.avatar" :src="cand.avatar" :alt="cand.name" class="cand-thumb-img" />
+                    <div v-else class="cand-thumb-fallback">{{ getInitials(cand.name) }}</div>
+                    <div class="cand-photo-overlay">📷</div>
+                  </div>
+
+                  <div class="cand-details-col">
+                    <input 
+                      type="text" 
+                      v-model="cand.name" 
+                      class="cand-name-input" 
+                      @change="syncFromCards"
+                      placeholder="Candidate Name"
+                    />
+                    <div class="cand-meta-row">
+                      <span class="cand-dept-tag">{{ cand.department }}</span>
+                      <span class="cand-id-tag">{{ cand.id }}</span>
+                    </div>
+                  </div>
+
+                  <div class="cand-actions-col">
+                    <button 
+                      class="cand-upload-btn" 
+                      @click="triggerPhotoUploadForIndex(cIdx)" 
+                      title="Upload photo for this candidate"
+                    >
+                      📷
+                    </button>
+                    <button 
+                      class="cand-remove-btn" 
+                      @click="removeCandidateAt(cIdx)" 
+                      title="Remove candidate"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="drawer-footer">
+            <button class="primary-btn apply-btn" @click="closeRosterDrawer">
+              <span>CONFIRM & RETURN TO STAGE</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+    </transition>
+
+    <!-- Winners History Drawer -->
+    <transition name="drawer-anim">
+      <div v-if="isWinnersDrawerOpen" class="roster-drawer-backdrop" @click.self="closeWinnersDrawer">
+        <aside class="roster-drawer-panel winners-drawer-panel">
+          <div class="drawer-header">
+            <div class="drawer-title-group">
+              <span class="drawer-icon">🏆</span>
+              <div>
+                <h2 class="drawer-title">Official Winners Roster</h2>
+                <p class="drawer-subtitle">{{ winnersHistory.length }} Winners drawn successfully</p>
+              </div>
+            </div>
+            <button class="drawer-close-btn" @click="closeWinnersDrawer" title="Close Drawer">✕</button>
+          </div>
+
+          <div class="drawer-toolbar">
+            <button class="tool-btn excel-tool-btn" @click="exportWinnersToExcel" title="Export winners roster to Excel (.xlsx)">
+              <span>📊</span>
+              <span>Export to Excel</span>
+            </button>
+            <button class="tool-btn" @click="copyWinnersText" title="Copy formatted roster text to clipboard">
+              <span>📋</span>
+              <span>Copy List</span>
+            </button>
+            <button class="tool-btn clear-tool-btn" @click="clearWinnersHistory" title="Clear all recorded winners">
+              <span>🗑️</span>
+              <span>Clear History</span>
+            </button>
+          </div>
+
+          <div class="drawer-body">
+            <div v-if="winnersHistory.length === 0" class="empty-winners-hint">
+              <span class="empty-icon">🎫</span>
+              <p>No winners drawn yet. Click IGNITE & LAUNCH on the stage to start drawing!</p>
+            </div>
+
+            <div v-else class="winners-table-container">
+              <div v-for="(w, wIdx) in winnersHistory" :key="wIdx" class="winner-record-card">
+                <div class="winner-record-badge">#{{ winnersHistory.length - wIdx }}</div>
+                <div class="winner-record-avatar">
+                  <img v-if="w.avatar" :src="w.avatar" class="winner-avatar-img" />
+                  <div v-else class="winner-avatar-placeholder">{{ getInitials(w.name) }}</div>
+                </div>
+                <div class="winner-record-info">
+                  <div class="winner-record-title-row">
+                    <span class="winner-record-name">{{ w.name }}</span>
+                    <span class="winner-record-award">{{ w.awardTitle }} · {{ w.prizeName }}</span>
+                  </div>
+                  <div class="winner-record-meta-row">
+                    <span class="record-meta-tag">{{ w.department }}</span>
+                    <span class="record-meta-tag font-mono">{{ w.ticketSerial }}</span>
+                    <span class="record-meta-time">⏱ {{ w.timestamp }}</span>
+                    <span v-if="w.removedFromPool" class="record-status-tag tag-removed">Removed from Pool</span>
+                    <span v-else class="record-status-tag tag-kept">Kept in Pool</span>
+                  </div>
+                </div>
+                <div class="winner-record-actions">
+                  <button class="record-undo-btn" @click="returnWinnerToPool(wIdx)" title="Revoke win and return candidate back to the pool">
+                    Return to Pool
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="drawer-footer">
+            <button class="primary-btn apply-btn" @click="closeWinnersDrawer">
+              <span>RETURN TO STAGE</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+    </transition>
+
+    <!-- Award Tiers & Prize Settings Modal -->
+    <transition name="modal-fade">
+      <div v-if="isAwardModalOpen" class="stage-modal-backdrop" @click.self="closeAwardModal">
+        <div class="award-modal-card">
+          <div class="modal-card-header">
+            <div class="modal-title-col">
+              <h2 class="modal-title">Prize Tiers &amp; Ticket Settings</h2>
+              <p class="modal-desc">Configure awards, winner quotas, and customize all titles on the VIP Golden Ticket.</p>
+            </div>
+            <button class="drawer-close-btn" @click="closeAwardModal">✕</button>
+          </div>
+
+          <!-- Settings Modal Tabs -->
+          <div class="modal-tabs-header">
+            <button 
+              class="modal-tab-btn" 
+              :class="{ active: activeSettingsTab === 'tiers' }"
+              @click="activeSettingsTab = 'tiers'"
+            >
+              <span>🏆 Prize Tiers &amp; Quotas</span>
+            </button>
+            <button 
+              class="modal-tab-btn" 
+              :class="{ active: activeSettingsTab === 'ticket' }"
+              @click="activeSettingsTab = 'ticket'"
+            >
+              <span>🎫 VIP Ticket Titles &amp; Branding</span>
+            </button>
+          </div>
+
+          <!-- TAB 1: AWARDS & TIERS -->
+          <div v-if="activeSettingsTab === 'tiers'" class="modal-awards-list">
+            <div 
+              v-for="award in awards" 
+              :key="award.id" 
+              class="award-tier-item"
+              :class="{ 'tier-active': currentAwardId === award.id }"
+              @click="selectAward(award.id)"
+            >
+              <div class="tier-radio">
+                <span v-if="currentAwardId === award.id" class="radio-dot">●</span>
+                <span v-else class="radio-circle">○</span>
+              </div>
+              <div class="tier-content-col">
+                <div class="tier-top-row">
+                  <input 
+                    type="text" 
+                    v-model="award.title" 
+                    class="tier-title-input" 
+                    @click.stop
+                    placeholder="Tier Title"
+                  />
+                  <div class="tier-quota-control" @click.stop>
+                    <span class="quota-label">Quota:</span>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      max="999" 
+                      v-model.number="award.quota" 
+                      class="tier-quota-input"
+                    />
+                    <span class="quota-unit">winners</span>
+                  </div>
+                  <span class="tier-progress-badge" :class="{ 'badge-filled': isAwardFilled(award.id) }">
+                    {{ isAwardFilled(award.id) ? '● Quota Filled' : 'Drawn ' + getAwardWinnersCount(award.id) + '/' + award.quota }}
+                  </span>
+                </div>
+                <div class="tier-prize-row" @click.stop>
+                  <span class="prize-field-label">Prize:</span>
+                  <input 
+                    type="text" 
+                    v-model="award.prizeName" 
+                    class="tier-prize-input" 
+                    placeholder="e.g. MacBook Pro 16&quot;"
+                  />
+                </div>
+              </div>
+              <button class="tier-delete-btn" @click.stop="removeAward(award.id)" title="Delete this prize tier">✕</button>
+            </div>
+          </div>
+
+          <!-- TAB 2: VIP GOLDEN TICKET CUSTOMIZATION -->
+          <div v-else-if="activeSettingsTab === 'ticket'" class="modal-ticket-settings">
+            <div class="ticket-settings-intro">
+              <span class="intro-spark">✦</span>
+              <span>All titles on the VIP Golden Ticket are 100% customizable here or by clicking directly on the live ticket card.</span>
+            </div>
+
+            <div class="settings-form-grid">
+              <div class="settings-field-group">
+                <label class="settings-field-label">Ticket Brand / Event Title</label>
+                <input type="text" v-model="ticketConfig.brandTitle" class="settings-field-input" placeholder="e.g. ANNUAL GALA VIP PASS" />
+                <span class="settings-field-hint">Header title displayed on the upper-left of the Golden Ticket.</span>
+              </div>
+
+              <div class="settings-field-group">
+                <label class="settings-field-label">Winner Eyebrow / Admission Subtitle</label>
+                <input type="text" v-model="ticketConfig.admissionEyebrow" class="settings-field-input" placeholder="e.g. OFFICIAL WINNER ADMISSION" />
+                <span class="settings-field-hint">Subtitle displayed directly above the winner's name.</span>
+              </div>
+
+              <div class="settings-field-group">
+                <label class="settings-field-label">Tear-Off Stub Claim Title</label>
+                <input type="text" v-model="ticketConfig.stubTitle" class="settings-field-input" placeholder="e.g. OFFICIAL CLAIM STUB" />
+                <span class="settings-field-hint">Title printed on the bottom horizontal black tear-off stub.</span>
+              </div>
+
+              <div class="settings-row-2col">
+                <div class="settings-field-group">
+                  <label class="settings-field-label">Ceremony Venue</label>
+                  <input type="text" v-model="ticketConfig.venue" class="settings-field-input" placeholder="e.g. CELESTIAL HALL" />
+                </div>
+                <div class="settings-field-group">
+                  <label class="settings-field-label">Ceremony Date</label>
+                  <input type="text" v-model="ticketConfig.eventDate" class="settings-field-input" placeholder="e.g. 2026.09.29" />
+                </div>
+              </div>
+
+              <div class="settings-row-2col">
+                <div class="settings-field-group">
+                  <label class="settings-field-label">Seal Stamp Text</label>
+                  <input type="text" v-model="ticketConfig.securityStamp" class="settings-field-input" placeholder="e.g. VERIFIED" />
+                </div>
+                <div class="settings-field-group">
+                  <label class="settings-field-label">Barcode Security Badge</label>
+                  <input type="text" v-model="ticketConfig.securityBadge" class="settings-field-input" placeholder="e.g. ★ AUTHENTICATED ★" />
+                </div>
+              </div>
+            </div>
+
+            <div class="ticket-reset-row">
+              <button class="ghost-btn reset-ticket-btn" @click="resetTicketConfig">
+                <span>↺ Reset Ticket Titles to Defaults</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="modal-actions-bar">
+            <button v-if="activeSettingsTab === 'tiers'" class="ghost-btn add-tier-btn" @click="addNewAward">
+              <span>➕ Add New Tier</span>
+            </button>
+            <div v-else></div>
+            <button class="primary-btn apply-modal-btn" @click="closeAwardModal">
+              <span>✓ Save &amp; Return to Stage</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Hidden Native File Inputs -->
+    <input 
+      type="file" 
+      id="excel-file-input" 
+      accept=".xlsx,.xls,.csv" 
+      style="display:none" 
+      @change="onExcelSelected" 
+    />
+    <input 
+      type="file" 
+      id="roster-photo-file-input" 
+      accept="image/*" 
+      style="display:none" 
+      @change="onPhotoSelected" 
+    />
+
+    <!-- Toast Notification System -->
+    <transition name="toast-anim">
+      <div v-if="toastMessage" class="stage-toast-bar" :class="'toast-' + toastType">
+        <span class="toast-icon">{{ toastType === 'success' ? '✓' : (toastType === 'warning' ? '⚠️' : 'ℹ') }}</span>
+        <span>{{ toastMessage }}</span>
+      </div>
+    </transition>
+
+  </div>
+
+  <script src="app.js?v=gala-v4-en"></script>
+</body>
+</html>

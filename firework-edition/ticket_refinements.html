@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIP Golden Ticket · Stub Layout Refinement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --gold-100: #fef9c3;
+      --gold-200: #fef08a;
+      --gold-300: #fde047;
+      --gold-400: #facc15;
+      --gold-500: #eab308;
+      --gold-gradient: linear-gradient(135deg, #fff7ed 0%, #fef08a 25%, #d97706 70%, #78350f 100%);
+      --crimson-velvet: radial-gradient(circle at 40% 30%, #360615 0%, #1e030c 60%, #0d0105 100%);
+    }
+
+    body {
+      background: #060209;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      padding: 30px 20px 80px;
+      position: relative;
+    }
+
+    .galaxy-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: 
+        radial-gradient(ellipse 90% 55% at 50% -10%, rgba(139, 92, 246, 0.28), transparent 70%),
+        radial-gradient(ellipse 70% 50% at 85% 80%, rgba(244, 63, 94, 0.22), transparent 70%),
+        radial-gradient(ellipse 60% 40% at 15% 45%, rgba(245, 158, 11, 0.18), transparent 60%),
+        radial-gradient(circle at 50% 50%, #150519 0%, #09020d 60%, #030005 100%);
+    }
+    .stars-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: 
+        radial-gradient(1.5px 1.5px at 20px 30px, #fef08a, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 150px 180px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 320px 90px, #f43f5e, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 450px 240px, #a855f7, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 800px 120px, #ffffff, rgba(0,0,0,0));
+      background-size: 550px 550px;
+      opacity: 0.65;
+    }
+
+    .header {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto 30px;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fef08a;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 32px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff 0%, #fef08a 40%, #f59e0b 80%, #e11d48 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #fed7aa;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* Comparison Tabs */
+    .tab-bar {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+      z-index: 10;
+      margin-bottom: 36px;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      background: rgba(20, 5, 12, 0.75);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      color: #fbd5c3;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover {
+      border-color: #f59e0b;
+      color: #fff;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(225, 29, 72, 0.35), rgba(245, 158, 11, 0.35));
+      border: 1.5px solid #fef08a;
+      color: #fff;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.35);
+    }
+
+    .stage-area {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 520px;
+      margin-bottom: 40px;
+    }
+
+    .ticket-variant {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    .ticket-variant.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Common Holographic Sheen */
+    .holo-sheen {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 20%, rgba(254, 240, 138, 0.18) 40%, rgba(244, 63, 94, 0.18) 55%, transparent 75%);
+      background-size: 200% 200%;
+      animation: holoMove 6s linear infinite;
+      pointer-events: none;
+      z-index: 4;
+    }
+    @keyframes holoMove {
+      0% { background-position: -150% 0; }
+      100% { background-position: 250% 0; }
+    }
+
+    /* ==============================================================
+       OPTION A: Right Stub with 90° Rotated Text (Concert/Boarding Pass)
+       ============================================================== */
+    .ticket-container-A {
+      width: 860px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ticket-card-A {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 210px;
+      background: var(--crimson-velvet);
+      border-radius: 26px;
+      overflow: hidden;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.95), 0 0 45px rgba(225, 29, 72, 0.35);
+      position: relative;
+    }
+
+    .ticket-main-A {
+      padding: 34px 34px 28px;
+      position: relative;
+      z-index: 2;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 40%),
+        repeating-linear-gradient(45deg, rgba(245, 158, 11, 0.02) 0px, rgba(245, 158, 11, 0.02) 2px, transparent 2px, transparent 12px);
+    }
+
+    .ticket-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+      padding-bottom: 12px;
+    }
+    .ticket-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ticket-brand-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: #fef08a;
+      letter-spacing: 2px;
+    }
+    .ticket-serial {
+      font-family: monospace;
+      font-size: 12px;
+      color: #f59e0b;
+      letter-spacing: 1px;
+      border: 1px dashed rgba(245, 158, 11, 0.5);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .ticket-body-grid {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .photo-bracket-frame {
+      position: relative;
+      width: 124px;
+      height: 124px;
+      flex-shrink: 0;
+      padding: 5px;
+      background: #140308;
+    }
+    .photo-bracket-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+      display: block;
+    }
+    .corner-bracket {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-color: #fef08a;
+      border-style: solid;
+      pointer-events: none;
+    }
+    .corner-bracket.tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+    .corner-bracket.tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+    .corner-bracket.bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+    .corner-bracket.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+    .ticket-info { flex: 1; }
+    .ticket-winner-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: #facc15;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    .ticket-winner-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #fff, #fef08a 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+      line-height: 1.1;
+    }
+    .ticket-dept {
+      font-size: 12px;
+      color: #fed7aa;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    .ticket-prize-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+    .ticket-prize-badge .tier {
+      color: #fef08a;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .ticket-prize-badge .pname {
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .ticket-bottom-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid rgba(245, 158, 11, 0.15);
+      padding-top: 12px;
+    }
+    .barcode-lines {
+      height: 26px;
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      opacity: 0.7;
+    }
+    .b-bar { background: #facc15; width: 2px; height: 100%; }
+    .b-bar.w2 { width: 4px; }
+    .b-bar.w3 { width: 6px; }
+    .b-bar.s { height: 75%; }
+    .ticket-security-note {
+      font-size: 10px;
+      color: #fed7aa;
+      opacity: 0.6;
+      letter-spacing: 1px;
+    }
+
+    /* Right Stub for Variant A (Rotated 90 degrees text) */
+    .ticket-stub-A {
+      position: relative;
+      background: rgba(18, 3, 9, 0.96);
+      border-left: 2px dashed rgba(245, 158, 11, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 20px;
+      overflow: hidden;
+    }
+    .stub-notch-top {
+      position: absolute;
+      top: -14px; left: -14px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #060209;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      z-index: 5;
+    }
+    .stub-notch-bottom {
+      position: absolute;
+      bottom: -14px; left: -14px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #060209;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      z-index: 5;
+    }
+
+    .rotated-strip-content {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      white-space: nowrap;
+    }
+    .rotated-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fef08a;
+    }
+    .rotated-pill {
+      font-family: monospace;
+      font-size: 11px;
+      color: #1a040b;
+      background: #f59e0b;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+    .rotated-meta {
+      font-size: 11px;
+      color: #fed7aa;
+      letter-spacing: 1px;
+      opacity: 0.85;
+    }
+
+    /* ==============================================================
+       OPTION B: Bottom Horizontal Stub (Full-Width Tear-Off Coupon)
+       ============================================================== */
+    .ticket-container-B {
+      width: 760px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ticket-card-B {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--crimson-velvet);
+      border-radius: 26px;
+      overflow: hidden;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.95), 0 0 45px rgba(225, 29, 72, 0.35);
+      position: relative;
+    }
+
+    .ticket-main-B {
+      padding: 30px 34px 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Bottom Horizontal Stub */
+    .ticket-stub-B {
+      position: relative;
+      background: rgba(16, 2, 7, 0.98);
+      border-top: 2px dashed rgba(245, 158, 11, 0.4);
+      padding: 16px 34px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    .stub-notch-left {
+      position: absolute;
+      top: -14px; left: -14px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #060209;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      z-index: 5;
+    }
+    .stub-notch-right {
+      position: absolute;
+      top: -14px; right: -14px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #060209;
+      border: 2px solid rgba(245, 158, 11, 0.45);
+      z-index: 5;
+    }
+
+    .stub-b-col-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .stub-b-stamp {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1.5px dashed #f59e0b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fef08a;
+      transform: rotate(-10deg);
+    }
+    .stub-b-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fef08a;
+      letter-spacing: 1.5px;
+      margin-bottom: 3px;
+    }
+    .stub-b-serial {
+      font-family: monospace;
+      font-size: 12px;
+      color: #f59e0b;
+    }
+
+    .stub-b-col-center {
+      text-align: center;
+      font-size: 11px;
+      color: #fed7aa;
+      line-height: 1.5;
+      letter-spacing: 0.5px;
+      opacity: 0.85;
+    }
+
+    .stub-b-col-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    /* Floating Capsule Dock (Common to both) */
+    .capsule-dock {
+      margin-top: 22px;
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 12px;
+      background: rgba(18, 4, 10, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 999px;
+      padding: 6px 10px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 25px rgba(245, 158, 11, 0.2);
+      backdrop-filter: blur(16px);
+    }
+    .dock-primary-btn {
+      background: linear-gradient(135deg, #fef08a 0%, #f59e0b 60%, #b45309 100%);
+      color: #1e050b;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+      transition: all 0.2s ease;
+    }
+    .dock-primary-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 6px 22px rgba(254, 240, 138, 0.6);
+    }
+    .dock-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fed7aa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+    .dock-icon-btn:hover {
+      background: rgba(245, 158, 11, 0.25);
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    /* Explanation Section */
+    .notes-box {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(18, 4, 10, 0.8);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 18px;
+      padding: 24px 30px;
+    }
+    .notes-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fef08a;
+      margin-bottom: 12px;
+    }
+    .notes-desc {
+      font-size: 14px;
+      color: #fed7aa;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="galaxy-bg"></div>
+  <div class="stars-layer"></div>
+
+  <div class="header">
+    <div class="badge-pill">✦ Authentic Ticket Stub Orientation ✦</div>
+    <h1>VIP Golden Ticket · 副券文字方向对比</h1>
+    <p class="subtitle">
+      针对你提出的“副券黑色部分的文字应该顺应票根横向”的关键建议，制作了两种最正统的国际票券排版方案供你挑选：
+    </p>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchVariant('A')">
+      <span>🎫 方案 A：侧边副券 · 90° 旋转长轴横读（经典演唱会/登机牌）</span>
+    </button>
+    <button class="tab-btn" onclick="switchVariant('B')">
+      <span>🎟️ 方案 B：底部副券 · 宽幅横向撕裂凭条（经典盛典抽奖金券）</span>
+    </button>
+  </div>
+
+  <div class="stage-area">
+
+    <!-- VARIANT A -->
+    <div id="variant-A" class="ticket-variant active">
+      <div class="ticket-container-A">
+        <div class="ticket-card-A">
+          <div class="holo-sheen"></div>
+
+          <!-- Main Ticket -->
+          <div class="ticket-main-A">
+            <div class="ticket-header-row">
+              <div class="ticket-brand">
+                <span style="font-size: 18px;">✦</span>
+                <span class="ticket-brand-logo">ANNUAL GALA VIP PASS</span>
+              </div>
+              <div class="ticket-serial">NO. 2026-GALA-001</div>
+            </div>
+
+            <div class="ticket-body-grid">
+              <div class="photo-bracket-frame">
+                <div class="corner-bracket tl"></div>
+                <div class="corner-bracket tr"></div>
+                <div class="corner-bracket bl"></div>
+                <div class="corner-bracket br"></div>
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=256&q=80" alt="Olivia Bennett">
+              </div>
+
+              <div class="ticket-info">
+                <div class="ticket-winner-badge">OFFICIAL WINNER ADMISSION</div>
+                <div class="ticket-winner-name">Olivia Bennett</div>
+                <div class="ticket-dept">EMPLOYEE ID: EMP-1490 · PEOPLE &amp; CULTURE (HR)</div>
+                <div class="ticket-prize-badge">
+                  <span class="tier">【GRAND PRIZE】</span>
+                  <span class="pname">Apple MacBook Pro 16" M3 Max</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ticket-bottom-bar">
+              <div class="barcode-lines">
+                <div class="b-bar"></div><div class="b-bar w2"></div><div class="b-bar s"></div><div class="b-bar w3"></div>
+                <div class="b-bar"></div><div class="b-bar w2 s"></div><div class="b-bar"></div><div class="b-bar w3"></div>
+                <div class="b-bar s"></div><div class="b-bar"></div><div class="b-bar w2"></div><div class="b-bar"></div>
+                <div class="b-bar w3 s"></div><div class="b-bar"></div><div class="b-bar"></div><div class="b-bar w2"></div>
+                <div class="b-bar s"></div><div class="b-bar w3"></div><div class="b-bar"></div><div class="b-bar w2"></div>
+              </div>
+              <div class="ticket-security-note">★ ANTI-COUNTERFEITING HOLOGRAM SEALED ★</div>
+            </div>
+          </div>
+
+          <!-- Right Stub with Rotated Text -->
+          <div class="ticket-stub-A">
+            <div class="stub-notch-top"></div>
+            <div class="stub-notch-bottom"></div>
+
+            <div class="rotated-strip-content">
+              <span class="rotated-title">✦ OFFICIAL CLAIM STUB</span>
+              <span class="rotated-pill">TKT-2026-1490</span>
+              <span class="rotated-meta">ADMIT ONE · VENUE: CELESTIAL HALL · 2026.09.29 ✦</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- External Capsule Dock -->
+        <div class="capsule-dock">
+          <button class="dock-primary-btn">
+            <span>🏆 CLAIM &amp; ISSUE REWARD</span>
+          </button>
+          <button class="dock-icon-btn" title="Print VIP Golden Ticket">🖨️</button>
+          <button class="dock-icon-btn" title="View Department Roster">👥</button>
+          <button class="dock-icon-btn" title="Draw Next Round">✨</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANT B -->
+    <div id="variant-B" class="ticket-variant">
+      <div class="ticket-container-B">
+        <div class="ticket-card-B">
+          <div class="holo-sheen"></div>
+
+          <!-- Main Upper Pass -->
+          <div class="ticket-main-B">
+            <div class="ticket-header-row">
+              <div class="ticket-brand">
+                <span style="font-size: 18px;">✦</span>
+                <span class="ticket-brand-logo">ANNUAL GALA VIP PASS</span>
+              </div>
+              <div class="ticket-serial">NO. 2026-GALA-001</div>
+            </div>
+
+            <div class="ticket-body-grid">
+              <div class="photo-bracket-frame">
+                <div class="corner-bracket tl"></div>
+                <div class="corner-bracket tr"></div>
+                <div class="corner-bracket bl"></div>
+                <div class="corner-bracket br"></div>
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=256&q=80" alt="Olivia Bennett">
+              </div>
+
+              <div class="ticket-info">
+                <div class="ticket-winner-badge">OFFICIAL WINNER ADMISSION</div>
+                <div class="ticket-winner-name">Olivia Bennett</div>
+                <div class="ticket-dept">EMPLOYEE ID: EMP-1490 · PEOPLE &amp; CULTURE (HR)</div>
+                <div class="ticket-prize-badge">
+                  <span class="tier">【GRAND PRIZE】</span>
+                  <span class="pname">Apple MacBook Pro 16" M3 Max</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Horizontal Stub -->
+          <div class="ticket-stub-B">
+            <div class="stub-notch-left"></div>
+            <div class="stub-notch-right"></div>
+
+            <div class="stub-b-col-left">
+              <div class="stub-b-stamp">
+                <span style="font-size: 11px;">★</span>
+                <span style="font-size: 7px; font-weight: 900;">VERIFIED</span>
+              </div>
+              <div>
+                <div class="stub-b-title">OFFICIAL CLAIM STUB</div>
+                <div class="stub-b-serial">TKT-2026-1490 · ADMIT ONE</div>
+              </div>
+            </div>
+
+            <div class="stub-b-col-center">
+              DATE: 2026.09.29<br>
+              VENUE: CELESTIAL HALL
+            </div>
+
+            <div class="stub-b-col-right">
+              <div class="barcode-lines">
+                <div class="b-bar"></div><div class="b-bar w2"></div><div class="b-bar s"></div><div class="b-bar w3"></div>
+                <div class="b-bar"></div><div class="b-bar w2 s"></div><div class="b-bar"></div><div class="b-bar w3"></div>
+                <div class="b-bar s"></div><div class="b-bar"></div><div class="b-bar w2"></div>
+              </div>
+              <div style="font-size: 9px; color: #fed7aa; opacity: 0.6; letter-spacing: 1px;">★ AUTHENTICATED ★</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- External Capsule Dock -->
+        <div class="capsule-dock">
+          <button class="dock-primary-btn">
+            <span>🏆 CLAIM &amp; ISSUE REWARD</span>
+          </button>
+          <button class="dock-icon-btn" title="Print VIP Golden Ticket">🖨️</button>
+          <button class="dock-icon-btn" title="View Department Roster">👥</button>
+          <button class="dock-icon-btn" title="Draw Next Round">✨</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="notes-box">
+    <div class="notes-title">💡 两种正统副券（Stub）横向排版说明</div>
+    <div class="notes-desc">
+      • <b>方案 A（侧边 90° 旋转长轴横读）</b>：这是国际航司登机牌与演唱会门票（如 Ticketmaster）最普遍的样式。撕裂线在右侧，文字顺着票券副券的长轴方向印刷，撕下后拿在手中就是一张标准横条凭据，极具工业防伪美感。<br>
+      • <b>方案 B（底部宽幅横向撕裂凭条）</b>：这是高端年会盛典、晚宴抽奖金券（Raffle Golden Ticket）最青睐的形态。将黑色副券置于卡片底部，整行文字自然横向展布，从左到右依次为印戳、中奖凭证编号、地点与条形码，阅读最直观。
+    </div>
+  </div>
+
+  <script>
+    function switchVariant(v) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', (v === 'A' && i === 0) || (v === 'B' && i === 1));
+      });
+      document.getElementById('variant-A').classList.toggle('active', v === 'A');
+      document.getElementById('variant-B').classList.toggle('active', v === 'B');
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>两款定制舞台背景概念图对比 — 专为烟花抽奖打造</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #06070b;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+      padding: 40px 24px;
+      min-height: 100vh;
+    }
+    .header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 36px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #e879f9, #a242a5, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #0d0f18;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(232, 121, 249, 0.5);
+      box-shadow: 0 20px 40px rgba(162, 66, 165, 0.25);
+    }
+    .img-wrap {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: #000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .card:hover .img-wrap img {
+      transform: scale(1.02);
+    }
+    .badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .content {
+      padding: 24px;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .desc {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .highlights {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid #a242a5;
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+      color: #e2e8f0;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .ref-section {
+      max-width: 1400px;
+      margin: 40px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: #64748b;
+      font-size: 13px;
+    }
+    .ref-img {
+      height: 48px;
+      background: #111420;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>两款定制舞台背景概念方案</h1>
+    <p class="subtitle">针对大烟花绽放、中奖名单揭晓的舞台高对比度需求定制设计（点击卡片可查看大图）</p>
+  </div>
+
+  <div class="grid">
+    <!-- Option 1: Depth Tamed Galaxy -->
+    <a href="concept_galaxy_tuned.jpg" target="_blank" style="text-decoration: none; color: inherit;">
+      <div class="card">
+        <div class="img-wrap">
+          <span class="badge" style="color: #38bdf8;">方案 1 · 深空银河调优版</span>
+          <img src="concept_galaxy_tuned.jpg" alt="方案 1 深空银河调优版">
+        </div>
+        <div class="content">
+          <div class="title">🌌 方案 1：深空银河调优版 (Depth-Tamed Galaxy)</div>
+          <div class="desc">
+            把银河星云置于顶端上方弧形流转，<strong>中央爆炸核心区保持沉静深邃的曜石黑夜空</strong>。彻底解决了“背景太花吃掉烟花细节”的问题。
+          </div>
+          <div class="highlights">
+            ✨ <strong>烟花表现：</strong> 烟花与拖尾粒子在中央深空具有极致的对比度与清晰度，上方星河提供神秘浩瀚的宇宙舞台感。
+          </div>
+          <div class="tags">
+            <span class="tag">🌌 柔光星河</span>
+            <span class="tag">🎯 烟花对比度MAX</span>
+            <span class="tag">✨ 极简浩瀚</span>
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Option 2: Brand Orchid Purple Stage -->
+    <a href="concept_brand_orchid_stage.png" target="_blank" style="text-decoration: none; color: inherit;">
+      <div class="card">
+        <div class="img-wrap">
+          <span class="badge" style="color: #e879f9;">方案 2 · 专属品牌紫盛典舞台</span>
+          <img src="concept_brand_orchid_stage.png" alt="方案 2 专属品牌紫盛典舞台">
+        </div>
+        <div class="content">
+          <div class="title">🟣 方案 2：专属品牌紫盛典舞台 (Brand Orchid Keynote)</div>
+          <div class="desc">
+            <strong>基于你提供的票券 Logo 配色（兰花紫 / 洋红 #a242a5）</strong>，打造出类似苹果发布会/电竞盛典的高级暗黑舞台：底部微弧镜面地光，顶端优雅的品牌极光丝带与少量闪烁星尘。
+          </div>
+          <div class="highlights">
+            ✨ <strong>品牌认同：</strong> 与你的票券 Logo 品牌色调 100% 呼应，专属感极强，高级、年轻且充满仪式感！
+          </div>
+          <div class="tags">
+            <span class="tag">🟣 专属品牌配色</span>
+            <span class="tag">💎 弧形舞台地光</span>
+            <span class="tag">🏆 盛典仪式感</span>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="ref-section">
+    <img src="user_logo.png" class="ref-img" alt="品牌Logo参考">
+    <span>💡 方案 2 的主色调（深邃曜石黑 + 兰花紫光效）提炼自上方你上传的票券品牌图片。</span>
+  </div>
+</body>
+</html>
