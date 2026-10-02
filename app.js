@@ -1,7 +1,7 @@
 /**
  * ==========================================================================
- * ANNUAL GALA LUCKY DRAW — TRI-MODE: FOIL PACK, GALA REEL & TICKER FORTUNE WHEEL
- * Vue 3 Application, Web Audio Synthesizer & Real Physics Engines
+ * ANNUAL GALA CELESTIAL FIREWORK LUCKY DRAW — STANDALONE EDITION
+ * Vue 3, Web Audio Procedural Sound Synthesizer & 60 FPS Pyrotechnic Canvas
  * ==========================================================================
  */
 
@@ -33,796 +33,1008 @@ class ProceduralAudioEngine {
     this.isMuted = muted;
   }
 
-  // Foil pack swipe sound
-  playSliceScratchSound(intensity = 0.5) {
+  // Phase 1: Quickmatch fuse burning sound
+  playFuseIgnite(duration = 0.4) {
     if (this.isMuted) return;
     this.initOnFirstGesture();
     if (!this.ctx) return;
 
     const ctx = this.ctx;
     const now = ctx.currentTime;
-    const duration = 0.08;
-
-    const bufferSize = ctx.sampleRate * duration;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.4 ? 0.8 : 0.2);
-    }
-
-    const noiseNode = ctx.createBufferSource();
-    noiseNode.buffer = buffer;
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.setValueAtTime(2000 + intensity * 2500, now);
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.01, now);
-    gain.gain.linearRampToValueAtTime(Math.min(0.25, 0.08 + intensity * 0.2), now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-    noiseNode.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-
-    noiseNode.start(now);
-    noiseNode.stop(now + duration);
-  }
-
-  // Foil pack cut complete sound
-  playSliceCompleteSound() {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-
-    const osc = ctx.createOscillator();
-    const oscGain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1800, now);
-    osc.frequency.exponentialRampToValueAtTime(3200, now + 0.15);
-
-    oscGain.gain.setValueAtTime(0.2, now);
-    oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-
-    osc.connect(oscGain);
-    oscGain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.35);
-
-    const ripDuration = 0.28;
-    const bufferSize = ctx.sampleRate * ripDuration;
+    const bufferSize = Math.floor(ctx.sampleRate * duration);
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
       data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.3 ? 0.9 : 0.15);
     }
 
-    const noiseNode = ctx.createBufferSource();
-    noiseNode.buffer = buffer;
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(2200, now);
-    filter.frequency.exponentialRampToValueAtTime(4200, now + ripDuration);
-    filter.Q.value = 2.5;
+    filter.frequency.setValueAtTime(3200, now);
+    filter.Q.setValueAtTime(3.5, now);
 
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + ripDuration);
-
-    noiseNode.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-
-    noiseNode.start(now);
-    noiseNode.stop(now + ripDuration);
-  }
-
-  // Card slide sound
-  playSlideSound() {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-    const duration = 0.55;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const filter = ctx.createBiquadFilter();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(420, now);
-    osc.frequency.exponentialRampToValueAtTime(160, now + duration);
-
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(800, now);
-
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.25, now + 0.1);
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(0.28, now + 0.05);
+    gain.gain.linearRampToValueAtTime(0.32, now + duration - 0.05);
     gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + duration);
-  }
-
-  // Card flip bell
-  playFlipSound() {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-    const duration = 0.8;
-
-    [2400, 3600].forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.05);
-
-      gain.gain.setValueAtTime(0.001, now + idx * 0.05);
-      gain.gain.linearRampToValueAtTime(0.2 / (idx + 1), now + 0.02 + idx * 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(now + idx * 0.05);
-      osc.stop(now + duration);
-    });
-  }
-
-  // ================= REEL MECHANICAL SOUNDS =================
-  // Individual mechanical detent notch click
-  playReelClick(speed = 1.0) {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = 'triangle';
-    const baseFreq = 500 + Math.min(500, speed * 25);
-    osc.frequency.setValueAtTime(baseFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.35, now + 0.028);
-
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.028);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.028);
-  }
-
-  // Creaking friction sound as inertia crawls over the barrier ridge
-  playFrictionGroan() {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(160, now);
-    osc.frequency.linearRampToValueAtTime(220, now + 0.2);
-    osc.frequency.linearRampToValueAtTime(140, now + 0.4);
-
-    gain.gain.setValueAtTime(0.12, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.4);
-  }
-
-  // Soft, light mechanical plectrum flutter on brass peg
-  playNeedleTick(speed = 1.0) {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    // High, delicate plectrum flick (crisp, light, low-drag)
-    osc.type = 'triangle';
-    const baseFreq = 1450 + Math.min(500, speed * 0.3);
-    osc.frequency.setValueAtTime(baseFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(260, now + 0.014);
-
-    gain.gain.setValueAtTime(0.12, now); // softened volume
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.014); // ultra-short crisp flutter
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.014);
-  }
-
-  // Heavy mechanical peg snap when peg crests the bent needle tip
-  playPegSnap() {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-
-    // 1. Sharp plectrum snap release
-    const snapOsc = ctx.createOscillator();
-    const snapGain = ctx.createGain();
-    snapOsc.type = 'sawtooth';
-    snapOsc.frequency.setValueAtTime(1400, now);
-    snapOsc.frequency.exponentialRampToValueAtTime(260, now + 0.035);
-
-    snapGain.gain.setValueAtTime(0.35, now);
-    snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
-
-    snapOsc.connect(snapGain);
-    snapGain.connect(ctx.destination);
-    snapOsc.start(now);
-    snapOsc.stop(now + 0.035);
-
-    // 2. Resonant brass chassis ping
-    const bellOsc = ctx.createOscillator();
-    const bellGain = ctx.createGain();
-    bellOsc.type = 'sine';
-    bellOsc.frequency.setValueAtTime(1850, now + 0.005);
-    bellGain.gain.setValueAtTime(0.22, now + 0.005);
-    bellGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-
-    bellOsc.connect(bellGain);
-    bellGain.connect(ctx.destination);
-    bellOsc.start(now + 0.005);
-    bellOsc.stop(now + 0.3);
-  }
-
-  // Solid mechanical latch "CLACK-CHING!" when resting into winner slot
-  playLatchSnap() {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-
-    // Heavy mechanical thump
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(820, now);
-    osc.frequency.exponentialRampToValueAtTime(180, now + 0.08);
-
-    gain.gain.setValueAtTime(0.35, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.08);
-
-    // High brass harmonic ring
-    const bell = ctx.createOscillator();
-    const bellGain = ctx.createGain();
-    bell.type = 'sine';
-    bell.frequency.setValueAtTime(2600, now + 0.015);
-    bellGain.gain.setValueAtTime(0.25, now + 0.015);
-    bellGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-
-    bell.connect(bellGain);
-    bellGain.connect(ctx.destination);
-    bell.start(now + 0.015);
-    bell.stop(now + 0.6);
-  }
-
-  // Triumphant fanfare
-  playFanfare() {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-
-    const notes = [
-      { f: 261.63, start: 0.00, dur: 0.9 },
-      { f: 329.63, start: 0.12, dur: 0.9 },
-      { f: 392.00, start: 0.24, dur: 1.1 },
-      { f: 523.25, start: 0.36, dur: 1.6 },
-      { f: 783.99, start: 0.48, dur: 1.8 }
-    ];
-
-    notes.forEach(note => {
-      const noteTime = now + note.start;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(note.f, noteTime);
-
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(1800, noteTime);
-
-      gain.gain.setValueAtTime(0.001, noteTime);
-      gain.gain.linearRampToValueAtTime(0.12, noteTime + 0.06);
-      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + note.dur);
-
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(noteTime);
-      osc.stop(noteTime + note.dur);
-    });
-  }
-
-  // ================= CELESTIAL FIREWORK PYROTECHNIC SOUNDS =================
-  playFuseIgnite(duration = 0.4) {
-    if (this.isMuted) return;
-    this.initOnFirstGesture();
-    if (!this.ctx) return;
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-    
-    // Sizzling potassium nitrate fuse cord
-    const bufSize = Math.floor(ctx.sampleRate * duration);
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const out = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) {
-      out[i] = (Math.random() * 2 - 1) * (Math.random() > 0.3 ? 0.75 : 0.2);
-    }
-    const noise = ctx.createBufferSource();
-    noise.buffer = buf;
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(3600, now);
-    filter.frequency.linearRampToValueAtTime(4800, now + duration);
-    filter.Q.setValueAtTime(3.5, now);
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.35, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
     noise.connect(filter);
     filter.connect(gain);
     gain.connect(ctx.destination);
-    noise.start(now);
 
-    // Micro-pops of sputtering black powder
-    for (let i = 0; i < 5; i++) {
-      const popTime = now + (i * duration / 5) + Math.random() * 0.03;
-      const popOsc = ctx.createOscillator();
-      const popGain = ctx.createGain();
-      popOsc.type = 'triangle';
-      popOsc.frequency.setValueAtTime(1200 + Math.random() * 800, popTime);
-      popGain.gain.setValueAtTime(0.08, popTime);
-      popGain.gain.exponentialRampToValueAtTime(0.001, popTime + 0.025);
-      popOsc.connect(popGain);
-      popGain.connect(ctx.destination);
-      popOsc.start(popTime);
-      popOsc.stop(popTime + 0.025);
-    }
+    noise.start(now);
+    noise.stop(now + duration);
   }
 
-  // 1. Mortar Tube Lift Charge (底火发射出膛重低音轰鸣与黑火药爆响)
+  // Phase 2A: Deep sub-bass mortar barrel bottom punch
   playMortarLift() {
     if (this.isMuted) return;
     this.initOnFirstGesture();
     if (!this.ctx) return;
+
     const ctx = this.ctx;
     const now = ctx.currentTime;
 
-    // A. Sub-bass tube thump (140Hz -> 30Hz) — physical air pressure shock
-    const subOsc = ctx.createOscillator();
-    const subGain = ctx.createGain();
-    subOsc.type = 'sine';
-    subOsc.frequency.setValueAtTime(140, now);
-    subOsc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
-    subGain.gain.setValueAtTime(1.0, now);
-    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-    subOsc.connect(subGain);
-    subGain.connect(ctx.destination);
-    subOsc.start(now);
-    subOsc.stop(now + 0.5);
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.exponentialRampToValueAtTime(38, now + 0.35);
 
-    // B. Hollow mortar tube chamber resonance (210Hz Q=5 ring)
-    const resOsc = ctx.createOscillator();
-    const resGain = ctx.createGain();
-    resOsc.type = 'triangle';
-    resOsc.frequency.setValueAtTime(210, now);
-    resOsc.frequency.exponentialRampToValueAtTime(80, now + 0.35);
-    resGain.gain.setValueAtTime(0.55, now);
-    resGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-    resOsc.connect(resGain);
-    resGain.connect(ctx.destination);
-    resOsc.start(now);
-    resOsc.stop(now + 0.35);
+    gain.gain.setValueAtTime(0.85, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
 
-    // C. Violent black powder muzzle blast noise crack
-    const bufSize = Math.floor(ctx.sampleRate * 0.32);
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const out = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) out[i] = (Math.random() * 2 - 1) * 0.9;
-    const noise = ctx.createBufferSource();
-    noise.buffer = buf;
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(950, now);
-    filter.frequency.exponentialRampToValueAtTime(180, now + 0.32);
-    const nGain = ctx.createGain();
-    nGain.gain.setValueAtTime(0.9, now);
-    nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
-    noise.connect(filter);
-    filter.connect(nGain);
-    nGain.connect(ctx.destination);
-    noise.start(now);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.45);
   }
 
-  // 2. Realistic Pyrotechnic Rocket Ascent (Rushing Jet Wind + Aerodynamic Screamer Whistle)
-  playRocketAscent(duration = 1.3) {
+  // Phase 2B: High-velocity screaming rocket tail (Soaring Ascent Whistle)
+  playRocketAscent(duration = 2.6) {
     if (this.isMuted) return;
     this.initOnFirstGesture();
     if (!this.ctx) return;
+
     const ctx = this.ctx;
     const now = ctx.currentTime;
 
-    // A. Burning propellant rush & turbulent jet wind
-    const bufSize = Math.floor(ctx.sampleRate * duration);
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const out = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) out[i] = (Math.random() * 2 - 1) * 0.45;
-    const noise = ctx.createBufferSource();
-    noise.buffer = buf;
-    const nFilter = ctx.createBiquadFilter();
-    nFilter.type = 'bandpass';
-    nFilter.frequency.setValueAtTime(500, now);
-    nFilter.frequency.exponentialRampToValueAtTime(2200, now + duration * 0.95);
-    nFilter.Q.setValueAtTime(3.8, now);
-    const nGain = ctx.createGain();
-    nGain.gain.setValueAtTime(0.18, now);
-    nGain.gain.linearRampToValueAtTime(0.38, now + duration * 0.4);
-    nGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-    noise.connect(nFilter);
-    nFilter.connect(nGain);
-    nGain.connect(ctx.destination);
-    noise.start(now);
-
-    // B. Pyrotechnic screamer whistle with acoustic flutter (potassium benzoate whistle)
     const osc = ctx.createOscillator();
-    const oscGain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(580, now);
-    osc.frequency.exponentialRampToValueAtTime(1580, now + duration * 0.94);
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(240, now);
+    osc.frequency.exponentialRampToValueAtTime(920, now + duration);
 
-    // Aerodynamic air turbulence pitch vibrato
-    const vibrato = ctx.createOscillator();
-    const vibGain = ctx.createGain();
-    vibrato.frequency.value = 16; // 16Hz flutter
-    vibGain.gain.value = 28; // 28Hz pitch wobble
-    vibrato.connect(osc.frequency);
-    vibrato.start(now);
-    vibrato.stop(now + duration);
+    gain.gain.setValueAtTime(0.04, now);
+    gain.gain.linearRampToValueAtTime(0.38, now + duration * 0.75);
+    gain.gain.linearRampToValueAtTime(0.001, now + duration);
 
-    oscGain.gain.setValueAtTime(0.02, now);
-    oscGain.gain.linearRampToValueAtTime(0.25, now + 0.15);
-    oscGain.gain.setValueAtTime(0.28, now + duration * 0.85);
-    oscGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-    osc.connect(oscGain);
-    oscGain.connect(ctx.destination);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
     osc.start(now);
     osc.stop(now + duration);
   }
 
+  // Phase 4: Supernova Mortar Detonation Shockwave
   playMortarBlast() {
     if (this.isMuted) return;
     this.initOnFirstGesture();
     if (!this.ctx) return;
+
     const ctx = this.ctx;
     const now = ctx.currentTime;
 
-    // 1. Heavy sub-bass shockwave thump (35Hz ~ 130Hz)
+    // Sub-bass detonation boom
     const subOsc = ctx.createOscillator();
     const subGain = ctx.createGain();
     subOsc.type = 'sine';
-    subOsc.frequency.setValueAtTime(130, now);
-    subOsc.frequency.exponentialRampToValueAtTime(36, now + 0.7);
-    subGain.gain.setValueAtTime(0.85, now);
-    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    subOsc.frequency.setValueAtTime(95, now);
+    subOsc.frequency.exponentialRampToValueAtTime(28, now + 0.85);
+
+    subGain.gain.setValueAtTime(0.95, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+
     subOsc.connect(subGain);
     subGain.connect(ctx.destination);
     subOsc.start(now);
-    subOsc.stop(now + 0.7);
+    subOsc.stop(now + 1.1);
 
-    // 2. Punch noise crack
-    const bufSize = Math.floor(ctx.sampleRate * 0.45);
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const out = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) out[i] = (Math.random() * 2 - 1);
-    const noise = ctx.createBufferSource();
-    noise.buffer = buf;
-    const nFilter = ctx.createBiquadFilter();
-    nFilter.type = 'lowpass';
-    nFilter.frequency.setValueAtTime(550, now);
-    const nGain = ctx.createGain();
-    nGain.gain.setValueAtTime(0.65, now);
-    nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-    noise.connect(nFilter);
-    nFilter.connect(nGain);
-    nGain.connect(ctx.destination);
-    noise.start(now);
-
-    // 3. Crackling sparkle embers
-    for (let i = 0; i < 7; i++) {
-      const crackTime = now + 0.12 + i * 0.07 + Math.random() * 0.04;
-      const crkOsc = ctx.createOscillator();
-      const crkGain = ctx.createGain();
-      crkOsc.type = 'triangle';
-      crkOsc.frequency.setValueAtTime(950 + Math.random() * 650, crackTime);
-      crkGain.gain.setValueAtTime(0.12, crackTime);
-      crkGain.gain.exponentialRampToValueAtTime(0.001, crackTime + 0.045);
-      crkOsc.connect(crkGain);
-      crkGain.connect(ctx.destination);
-      crkOsc.start(crackTime);
-      crkOsc.stop(crackTime + 0.045);
+    // Incandescent powder shockwave crack
+    const dur = 0.65;
+    const bufferSize = Math.floor(ctx.sampleRate * dur);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.85;
     }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1400, now);
+    filter.frequency.exponentialRampToValueAtTime(220, now + dur);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.65, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    noise.start(now);
+    noise.stop(now + dur);
   }
 
-  playSwarmMorph() {
+  // Phase 4B: Secondary Pyrotechnic Crackle / Dragon Eggs Pops
+  playCrackle() {
     if (this.isMuted) return;
     this.initOnFirstGesture();
     if (!this.ctx) return;
+
     const ctx = this.ctx;
     const now = ctx.currentTime;
+    const dur = 0.38;
+    const bufferSize = Math.floor(ctx.sampleRate * dur);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.86 ? 0.95 : 0.03);
+    }
 
-    // Atmospheric rushing whoosh as particles swarm to center
-    const bufSize = Math.floor(ctx.sampleRate * 0.7);
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const out = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) out[i] = (Math.random() * 2 - 1) * 0.35;
     const noise = ctx.createBufferSource();
-    noise.buffer = buf;
-
+    noise.buffer = buffer;
     const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(320, now);
-    filter.frequency.exponentialRampToValueAtTime(1600, now + 0.65);
-    filter.Q.setValueAtTime(3.2, now);
+    filter.type = 'highpass';
+    filter.frequency.setValueAtTime(2600, now);
 
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.01, now);
-    gain.gain.linearRampToValueAtTime(0.24, now + 0.35);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+    gain.gain.setValueAtTime(0.42, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
     noise.connect(filter);
     filter.connect(gain);
     gain.connect(ctx.destination);
     noise.start(now);
-
-    // Ethereal rising harmonics (magnetic convergence)
-    const freqs = [329.63, 440.00, 554.37, 659.25, 880.00];
-    freqs.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      const oscGain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(f, now + i * 0.07);
-      osc.frequency.linearRampToValueAtTime(f * 1.45, now + 0.7);
-      oscGain.gain.setValueAtTime(0.001, now + i * 0.07);
-      oscGain.gain.linearRampToValueAtTime(0.09, now + 0.3);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
-      osc.connect(oscGain);
-      oscGain.connect(ctx.destination);
-      osc.start(now + i * 0.07);
-      osc.stop(now + 0.75);
-    });
+    noise.stop(now + dur);
   }
 
+  // Phase 5: Celebratory victory starlight fanfare
   playStarlightChime() {
     if (this.isMuted) return;
     this.initOnFirstGesture();
     if (!this.ctx) return;
+
     const ctx = this.ctx;
-    const now = ctx.currentTime;
-    const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+    const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C5, E5, G5, C6, E6
     freqs.forEach((f, idx) => {
-      const t = now + idx * 0.075;
+      const now = ctx.currentTime + idx * 0.08;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(f, t);
-      gain.gain.setValueAtTime(0.001, t);
-      gain.gain.linearRampToValueAtTime(0.16, t + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+      osc.frequency.setValueAtTime(f, now);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.22, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(t);
-      osc.stop(t + 1.2);
+      osc.start(now);
+      osc.stop(now + 1.4);
     });
   }
 }
 
-// ================= CONFETTI & SPARKS ENGINE =================
-class ParticleEngine {
-  constructor(canvasId) {
-    this.canvas = document.getElementById(canvasId);
-    this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
-    this.particles = [];
+// ================= CELESTIAL FIREWORK PHYSICS ENGINE (GALA HEAVY ARTILLERY EDITION) =================
+// Professional Dual-Canvas High-Performance Pyrotechnic System
+// - Dual-Canvas Light-Painting trails (silky long-exposure without array loops)
+// - Zero-GC Object Pooling (StarPool + SparkPool) for 60 FPS on low-spec hardware
+// - Massive Heavy Artillery Gala Scale (Outer Peony + Inner Pistil + Kamuro Willow Waterfall)
+
+const GALA_FIREWORK_COLORS = [
+  '#ffd700', // Imperial Sodium Gold (Kamuro Willow)
+  '#ff1744', // Strontium Crimson Ruby
+  '#00e5ff', // Electric Copper Cyan
+  '#d500f9', // Royal Potassium Violet / Magenta
+  '#00e676', // Barium Emerald Green
+  '#ff9100', // Calcium Solar Amber
+  '#ffffff', // Titanium Brilliant White
+  '#818cf8'  // Starlight Laser Blue
+];
+
+const GALA_MASTER_THEMES = [
+  {
+    name: 'Imperial Kamuro & Diamond Pistil (金柳锦冠 + 钻石白金内芯)',
+    outer: '#ffd700',
+    pistil: '#ffffff',
+    sparks: '#ffd700',
+    sky: 'rgba(255, 215, 0, 0.18)',
+    hasCrackle: true
+  },
+  {
+    name: 'Crimson Ruby & Emerald Core (红宝石皇冠 + 翡翠绿心)',
+    outer: '#ff1744',
+    pistil: '#00e676',
+    sparks: '#ff9100',
+    sky: 'rgba(255, 23, 68, 0.18)',
+    hasCrackle: true
+  },
+  {
+    name: 'Electric Cyan & Solar Amber (青空霓虹 + 耀阳琥珀)',
+    outer: '#00e5ff',
+    pistil: '#ff9100',
+    sparks: '#00e5ff',
+    sky: 'rgba(0, 229, 255, 0.17)',
+    hasCrackle: true
+  },
+  {
+    name: 'Royal Magenta & Starlight Gold (皇家紫晶 + 璨金内蕊)',
+    outer: '#d500f9',
+    pistil: '#ffd700',
+    sparks: '#ffffff',
+    sky: 'rgba(213, 0, 249, 0.17)',
+    hasCrackle: true
+  },
+  {
+    name: 'Supernova Tricolor Gala (三色盛宴特大礼花)',
+    outer: '#ff1744',
+    pistil: '#00e5ff',
+    sparks: '#ffd700',
+    sky: 'rgba(255, 215, 0, 0.20)',
+    hasCrackle: true
+  }
+];
+
+class CelestialFireworkEngine {
+  constructor(mainCanvasId = 'firework-canvas', trailsCanvasId = 'firework-trails-canvas') {
+    this.mainCanvasId = mainCanvasId;
+    this.trailsCanvasId = trailsCanvasId;
+    this.mainCanvas = null;
+    this.mainCtx = null;
+    this.trailsCanvas = null;
+    this.trailsCtx = null;
+
+    // Astronomy background stars
+    this.backgroundStars = [];
+    
+    // Active simulation entities
+    this.stars = [];
+    this.sparks = [];
+    this.burstFlashes = [];
+    this.rocket = null;
+    this.apexSpark = null;
+    
+    // Sky lighting
+    this.skyColor = null;
+    this.skyAlpha = 0;
+    
+    // Screen physics
+    this.screenShake = 0;
+    this.cameraSpeed = 0;
+    this.launchMuzzleX = 0;
+    this.launchMuzzleY = 0;
+    this.explosionState = null;
+    this.lastBackgroundBurst = 0;
     this.animId = null;
-    this.resize();
-    window.addEventListener('resize', () => this.resize());
+
+    // Memory object pools (Zero garbage collection churn)
+    this.starPool = [];
+    this.sparkPool = [];
+
+    this.ensureCanvas();
+    this.startLoop();
+    window.addEventListener('resize', () => {
+      this.resize();
+      this.initBackgroundStars();
+    });
+  }
+
+  obtainStar() {
+    if (this.starPool.length > 0) {
+      return this.starPool.pop();
+    }
+    return {
+      x: 0, y: 0, prevX: 0, prevY: 0,
+      vx: 0, vy: 0,
+      color: '#ffd700',
+      size: 3,
+      life: 1000,
+      maxLife: 1000,
+      drag: 0.98,
+      gravity: 0.18,
+      sparkFreq: 30,
+      sparkTimer: 0,
+      sparkColor: '#ffd700',
+      sparkSpeed: 1.5,
+      isCrackle: false,
+      hasCrackled: false
+    };
+  }
+
+  releaseStar(star) {
+    if (this.starPool.length < 1500) {
+      this.starPool.push(star);
+    }
+  }
+
+  obtainSpark() {
+    if (this.sparkPool.length > 0) {
+      return this.sparkPool.pop();
+    }
+    return {
+      x: 0, y: 0, prevX: 0, prevY: 0,
+      vx: 0, vy: 0,
+      color: '#ffd700',
+      life: 500,
+      maxLife: 500,
+      drag: 0.90,
+      gravity: 0.15
+    };
+  }
+
+  releaseSpark(spark) {
+    if (this.sparkPool.length < 3000) {
+      this.sparkPool.push(spark);
+    }
+  }
+
+  ensureCanvas() {
+    this.mainCanvas = document.getElementById(this.mainCanvasId);
+    this.trailsCanvas = document.getElementById(this.trailsCanvasId);
+    if (this.mainCanvas) this.mainCtx = this.mainCanvas.getContext('2d');
+    if (this.trailsCanvas) this.trailsCtx = this.trailsCanvas.getContext('2d');
+
+    if (this.mainCanvas && this.mainCtx) {
+      this.resize();
+      if (this.backgroundStars.length === 0) {
+        this.initBackgroundStars();
+      }
+      this.startLoop();
+      return true;
+    }
+    return false;
   }
 
   resize() {
-    if (!this.canvas) return;
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    if (this.mainCanvas && (this.mainCanvas.width !== w || this.mainCanvas.height !== h)) {
+      this.mainCanvas.width = w;
+      this.mainCanvas.height = h;
+    }
+    if (this.trailsCanvas && (this.trailsCanvas.width !== w || this.trailsCanvas.height !== h)) {
+      this.trailsCanvas.width = w;
+      this.trailsCanvas.height = h;
+      if (this.trailsCtx) {
+        this.trailsCtx.fillStyle = '#07080b';
+        this.trailsCtx.fillRect(0, 0, w, h);
+      }
+    }
   }
 
-  emitSparks(x, y) {
-    if (!this.canvas || !this.ctx) return;
-    const count = 5;
+  clear() {
+    this.ensureCanvas();
+    for (let i = 0; i < this.stars.length; i++) {
+      this.starPool.push(this.stars[i]);
+    }
+    this.stars.length = 0;
+    for (let i = 0; i < this.sparks.length; i++) {
+      this.sparkPool.push(this.sparks[i]);
+    }
+    this.sparks.length = 0;
+    this.burstFlashes.length = 0;
+    this.rocket = null;
+    this.apexSpark = null;
+    this.skyAlpha = 0;
+    this.screenShake = 0;
+    this.cameraSpeed = 0;
+    this.explosionState = null;
+    if (this.mainCtx && this.mainCanvas) {
+      this.mainCtx.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
+    }
+    if (this.trailsCtx && this.trailsCanvas) {
+      this.trailsCtx.fillStyle = '#07080b';
+      this.trailsCtx.fillRect(0, 0, this.trailsCanvas.width, this.trailsCanvas.height);
+    }
+  }
+
+  startLoop() {
+    if (!this.animId) {
+      this.loop();
+    }
+  }
+
+  initBackgroundStars() {
+    this.backgroundStars = [];
+    const count = 160;
+    const w = window.innerWidth || 1920;
+    const h = window.innerHeight || 1080;
     for (let i = 0; i < count; i++) {
-      this.particles.push({
-        type: 'spark',
-        x: x + (Math.random() * 8 - 4),
-        y: y + (Math.random() * 8 - 4),
-        vx: (Math.random() * 8 - 4),
-        vy: (Math.random() * -6 - 2),
-        size: Math.random() * 3.5 + 1.5,
-        color: Math.random() > 0.3 ? '#fef08a' : '#38bdf8',
-        opacity: 1,
-        decay: Math.random() * 0.04 + 0.03,
-        gravity: 0.25
+      this.backgroundStars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        size: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.6 + 0.25,
+        twinkleSpeed: Math.random() * 0.003 + 0.001,
+        phase: Math.random() * Math.PI * 2,
+        isMajor: i < 14
       });
     }
+  }
 
-    if (!this.animId) {
-      this.render();
+  triggerSkyGlow(skyColor) {
+    this.skyColor = skyColor;
+    this.skyAlpha = 1.0;
+  }
+
+  // Launch Rocket with heavy soaring trail (2.60s ascent)
+  launchRocket(startX, startY, targetX, targetY, durationMs, onApex, onExplode) {
+    this.ensureCanvas();
+    this.launchMuzzleX = startX;
+    this.launchMuzzleY = startY;
+
+    this.rocket = {
+      x: startX,
+      y: startY,
+      prevX: startX,
+      prevY: startY,
+      startX,
+      startY,
+      targetX,
+      targetY,
+      startTime: performance.now(),
+      duration: durationMs,
+      onApex,
+      onExplode,
+      apexTriggered: false
+    };
+
+    this.screenShake = 14.0;
+
+    // Mortar muzzle initial lift propellant sparks
+    for (let i = 0; i < 110; i++) {
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.44;
+      const speed = Math.random() * 26 + 12;
+      const sp = this.obtainSpark();
+      sp.x = startX + (Math.random() - 0.5) * 16;
+      sp.y = startY + (Math.random() - 0.5) * 4;
+      sp.prevX = sp.x;
+      sp.prevY = sp.y;
+      sp.vx = Math.cos(angle) * speed;
+      sp.vy = Math.sin(angle) * speed;
+      sp.color = Math.random() > 0.35 ? '#ffd700' : '#ffffff';
+      sp.life = Math.random() * 600 + 400;
+      sp.maxLife = sp.life;
+      sp.drag = 0.92;
+      sp.gravity = 0.26;
+      this.sparks.push(sp);
+    }
+
+    if (!this.animId) this.loop();
+  }
+
+  // Create Mega Gala Artillery Explosion (大花火盛开 - 震撼大型礼花弹)
+  createExplosion(x, y, nameText, onMorphStart, onLocked) {
+    this.ensureCanvas();
+    this.apexSpark = null;
+    this.rocket = null;
+
+    const theme = GALA_MASTER_THEMES[Math.floor(Math.random() * GALA_MASTER_THEMES.length)];
+    this.triggerSkyGlow(theme.sky);
+
+    // Powerful Detonation Shockwave Flash (BurstFlash) & Heavy Screen Punch
+    this.screenShake = 22.0;
+    this.burstFlashes.push({
+      x,
+      y,
+      radius: 40,
+      maxRadius: Math.min(window.innerWidth || 1920, window.innerHeight || 1080) * 0.60,
+      speed: 32,
+      alpha: 1.0,
+      color: theme.outer
+    });
+
+    const now = performance.now();
+    this.explosionState = {
+      startTime: now,
+      onLocked,
+      lockedTriggered: false
+    };
+
+    // 1. Grand Outer Peony Ring (360 High-Velocity Incandescent Stars - Massive 600~800px spread)
+    const outerCount = 360;
+    for (let i = 0; i < outerCount; i++) {
+      const angle = (i / outerCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.08;
+      // High initial explosive impulse (15 ~ 23 px/frame)
+      const baseSpeed = Math.random() * 8 + 15.5;
+      const star = this.obtainStar();
+      star.x = x;
+      star.y = y;
+      star.prevX = x;
+      star.prevY = y;
+      star.vx = Math.cos(angle) * baseSpeed;
+      star.vy = Math.sin(angle) * baseSpeed;
+      star.color = theme.outer;
+      star.size = Math.random() * 1.6 + 3.2; // Bold 3.2~4.8px trail streak
+      star.life = Math.random() * 500 + 1300; // 1.3 ~ 1.8s burn
+      star.maxLife = star.life;
+      star.drag = 0.982; // Retains expansion momentum to fill screen
+      star.gravity = 0.16;
+      star.sparkFreq = 26; // Dense sparkling tail
+      star.sparkTimer = 0;
+      star.sparkColor = theme.sparks;
+      star.sparkSpeed = 1.7;
+      star.isCrackle = theme.hasCrackle && Math.random() < 0.45;
+      star.hasCrackled = false;
+      this.stars.push(star);
+    }
+
+    // 2. High-Density Inner Pistil (双重花芯 - 130 Stars with Contrasting Bright Color)
+    const pistilCount = 130;
+    for (let i = 0; i < pistilCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 5.0 + 7.5; // ~50% outer velocity creates brilliant inner flower
+      const star = this.obtainStar();
+      star.x = x;
+      star.y = y;
+      star.prevX = x;
+      star.prevY = y;
+      star.vx = Math.cos(angle) * speed;
+      star.vy = Math.sin(angle) * speed;
+      star.color = theme.pistil;
+      star.size = Math.random() * 1.2 + 2.5;
+      star.life = Math.random() * 350 + 900;
+      star.maxLife = star.life;
+      star.drag = 0.976;
+      star.gravity = 0.14;
+      star.sparkFreq = 36;
+      star.sparkTimer = 0;
+      star.sparkColor = '#ffffff';
+      star.sparkSpeed = 1.0;
+      star.isCrackle = false;
+      star.hasCrackled = false;
+      this.stars.push(star);
+    }
+
+    // 3. Kamuro Willow Golden Silk Waterfall (金柳垂丝瀑布 - 85 Heavy Streamers Cascading Downwards)
+    const willowCount = 85;
+    for (let i = 0; i < willowCount; i++) {
+      const angle = (Math.random() - 0.5) * Math.PI * 1.6 - Math.PI / 2;
+      const speed = Math.random() * 10 + 12;
+      const star = this.obtainStar();
+      star.x = x;
+      star.y = y;
+      star.prevX = x;
+      star.prevY = y;
+      star.vx = Math.cos(angle) * speed;
+      star.vy = Math.sin(angle) * speed;
+      star.color = '#ffd700'; // Pure Golden Kamuro
+      star.size = 3.8;
+      star.life = Math.random() * 700 + 1800; // Ultra long hanging life
+      star.maxLife = star.life;
+      star.drag = 0.989; // Retains momentum
+      star.gravity = 0.23; // Cascades like a golden silk waterfall
+      star.sparkFreq = 16; // Dense spark emitter
+      star.sparkTimer = 0;
+      star.sparkColor = '#ffd700';
+      star.sparkSpeed = 1.3;
+      star.isCrackle = false;
+      star.hasCrackled = false;
+      this.stars.push(star);
     }
   }
 
-  burstConfetti() {
-    if (!this.canvas || !this.ctx) return;
-    this.resize();
-    const count = 150;
-    const colors = [
-      '#f7d070', '#d4af37', '#ffd97d', '#ffffff', 
-      '#38bdf8', '#f43f5e', '#a855f7'
-    ];
-
-    for (let i = 0; i < count; i++) {
-      this.particles.push({
-        type: 'confetti',
-        x: this.canvas.width / 2 + (Math.random() * 240 - 120),
-        y: this.canvas.height * 0.42,
-        vx: (Math.random() * 18 - 9),
-        vy: (Math.random() * -15 - 5),
-        size: Math.random() * 9 + 5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        rotation: Math.random() * 360,
-        rotSpeed: (Math.random() * 12 - 6),
-        gravity: 0.35,
-        opacity: 1,
-        decay: Math.random() * 0.005 + 0.007
-      });
+  // Secondary Flanking Shell for Multi-Winner Batch Celebrations
+  spawnBackgroundBurst(customX, customY) {
+    if (!this.mainCanvas) return;
+    const w = this.mainCanvas.width;
+    const h = this.mainCanvas.height;
+    
+    let x = customX;
+    let y = customY;
+    if (x === undefined) {
+      const side = Math.random() > 0.5;
+      x = side ? w * (0.18 + Math.random() * 0.16) : w * (0.66 + Math.random() * 0.18);
+      y = h * (0.22 + Math.random() * 0.24);
     }
 
-    if (!this.animId) {
-      this.render();
+    const theme = GALA_MASTER_THEMES[Math.floor(Math.random() * GALA_MASTER_THEMES.length)];
+
+    // Small shockwave
+    this.burstFlashes.push({
+      x,
+      y,
+      radius: 20,
+      maxRadius: 180,
+      speed: 18,
+      alpha: 0.75,
+      color: theme.outer
+    });
+
+    const starCount = 140;
+    for (let i = 0; i < starCount; i++) {
+      const angle = (i / starCount) * Math.PI * 2;
+      const speed = Math.random() * 6.5 + 8.5;
+      const star = this.obtainStar();
+      star.x = x;
+      star.y = y;
+      star.prevX = x;
+      star.prevY = y;
+      star.vx = Math.cos(angle) * speed;
+      star.vy = Math.sin(angle) * speed;
+      star.color = theme.outer;
+      star.size = 2.6;
+      star.life = Math.random() * 350 + 850;
+      star.maxLife = star.life;
+      star.drag = 0.978;
+      star.gravity = 0.16;
+      star.sparkFreq = 34;
+      star.sparkTimer = 0;
+      star.sparkColor = theme.sparks;
+      star.sparkSpeed = 1.2;
+      star.isCrackle = theme.hasCrackle && Math.random() < 0.4;
+      star.hasCrackled = false;
+      this.stars.push(star);
     }
   }
 
-  render() {
-    if (!this.ctx) return;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  // Master Pyrotechnic Frame Loop
+  loop() {
+    if (!this.mainCtx) {
+      this.animId = requestAnimationFrame(() => this.loop());
+      return;
+    }
 
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      const p = this.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += p.gravity;
-      p.opacity -= p.decay;
+    const now = performance.now();
+    const w = this.mainCanvas.width;
+    const h = this.mainCanvas.height;
 
-      if (p.opacity <= 0 || p.y > this.canvas.height + 50) {
-        this.particles.splice(i, 1);
+    // 1. Trails Canvas: Light-Painting Long-Exposure Fade with alpha clearing (preserves transparent background)
+    if (this.trailsCtx) {
+      this.trailsCtx.globalCompositeOperation = 'destination-out';
+      this.trailsCtx.fillStyle = 'rgba(0, 0, 0, 0.16)';
+      this.trailsCtx.fillRect(0, 0, w, h);
+      this.trailsCtx.globalCompositeOperation = 'lighter';
+    }
+
+    // 2. Main Canvas: Instant White-Hot Heads & Atmospheric Wash
+    this.mainCtx.clearRect(0, 0, w, h);
+    this.mainCtx.save();
+
+    // Screen Shake
+    if (this.screenShake > 0.1) {
+      const sx = (Math.random() - 0.5) * this.screenShake;
+      const sy = (Math.random() - 0.5) * this.screenShake;
+      this.mainCtx.translate(sx, sy);
+      this.screenShake *= 0.88;
+    }
+
+    // Sky Ambient Illumination (colorSky)
+    if (this.skyAlpha > 0.01 && this.skyColor) {
+      const skyGrad = this.mainCtx.createRadialGradient(w / 2, h * 0.32, 20, w / 2, h * 0.32, w * 0.65);
+      skyGrad.addColorStop(0, this.skyColor);
+      skyGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      this.mainCtx.save();
+      this.mainCtx.globalAlpha = this.skyAlpha;
+      this.mainCtx.fillStyle = skyGrad;
+      this.mainCtx.fillRect(0, 0, w, h);
+      this.mainCtx.restore();
+      this.skyAlpha *= 0.94;
+    }
+
+    // Background Astronomical Starfield
+    for (let i = 0; i < this.backgroundStars.length; i++) {
+      const bs = this.backgroundStars[i];
+      const twinkle = Math.sin(now * bs.twinkleSpeed + bs.phase);
+      const alpha = Math.max(0.12, bs.alpha + twinkle * 0.28);
+      this.mainCtx.fillStyle = bs.isMajor ? `rgba(255, 235, 180, ${alpha * 1.2})` : `rgba(210, 225, 255, ${alpha})`;
+      this.mainCtx.beginPath();
+      this.mainCtx.arc(bs.x, bs.y, bs.size, 0, Math.PI * 2);
+      this.mainCtx.fill();
+    }
+
+    // Shockwave Burst Flashes
+    for (let i = this.burstFlashes.length - 1; i >= 0; i--) {
+      const bf = this.burstFlashes[i];
+      bf.radius += bf.speed;
+      bf.alpha *= 0.85;
+
+      const flashGrad = this.mainCtx.createRadialGradient(bf.x, bf.y, 0, bf.x, bf.y, bf.radius);
+      flashGrad.addColorStop(0, `rgba(255, 255, 255, ${bf.alpha * 0.95})`);
+      flashGrad.addColorStop(0.25, `rgba(255, 240, 180, ${bf.alpha * 0.45})`);
+      flashGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      this.mainCtx.fillStyle = flashGrad;
+      this.mainCtx.fillRect(bf.x - bf.radius, bf.y - bf.radius, bf.radius * 2, bf.radius * 2);
+
+      if (bf.alpha <= 0.02 || bf.radius >= bf.maxRadius) {
+        this.burstFlashes.splice(i, 1);
+      }
+    }
+
+    // 3. Rocket Ascent Physics (2.60s Soaring Plumb Line)
+    if (this.rocket) {
+      const elapsed = now - this.rocket.startTime;
+      const progress = Math.min(1, elapsed / this.rocket.duration);
+      // Realistic deceleration curve as rocket battles gravity to apex
+      const ease = Math.sin((progress * Math.PI) / 2);
+
+      this.rocket.prevX = this.rocket.x;
+      this.rocket.prevY = this.rocket.y;
+      this.rocket.x = this.rocket.startX + (this.rocket.targetX - this.rocket.startX) * ease;
+      this.rocket.y = this.rocket.startY + (this.rocket.targetY - this.rocket.startY) * ease;
+
+      // Rocket light-trail ribbon on trails canvas
+      if (this.trailsCtx) {
+        this.trailsCtx.strokeStyle = '#ffd700';
+        this.trailsCtx.lineWidth = 4.0;
+        this.trailsCtx.beginPath();
+        this.trailsCtx.moveTo(this.rocket.x, this.rocket.y);
+        this.trailsCtx.lineTo(this.rocket.prevX, this.rocket.prevY);
+        this.trailsCtx.stroke();
+      }
+
+      // Drop fiery golden rocket sparks along the ascent line
+      for (let s = 0; s < 4; s++) {
+        const sp = this.obtainSpark();
+        sp.x = this.rocket.x + (Math.random() - 0.5) * 5;
+        sp.y = this.rocket.y + Math.random() * 6;
+        sp.prevX = sp.x;
+        sp.prevY = sp.y;
+        sp.vx = (Math.random() - 0.5) * 2.2;
+        sp.vy = Math.random() * 4.5 + 2.2;
+        sp.color = Math.random() > 0.3 ? '#ff9100' : '#ffd700';
+        sp.life = Math.random() * 320 + 200;
+        sp.maxLife = sp.life;
+        sp.drag = 0.94;
+        sp.gravity = 0.20;
+        this.sparks.push(sp);
+      }
+
+      // Draw incandescent rocket head on main canvas
+      const headGlow = this.mainCtx.createRadialGradient(
+        this.rocket.x, this.rocket.y, 2,
+        this.rocket.x, this.rocket.y, 38
+      );
+      headGlow.addColorStop(0, '#ffffff');
+      headGlow.addColorStop(0.3, 'rgba(255, 215, 0, 0.85)');
+      headGlow.addColorStop(1, 'rgba(255, 145, 0, 0)');
+      this.mainCtx.fillStyle = headGlow;
+      this.mainCtx.beginPath();
+      this.mainCtx.arc(this.rocket.x, this.rocket.y, 38, 0, Math.PI * 2);
+      this.mainCtx.fill();
+
+      this.mainCtx.fillStyle = '#ffffff';
+      this.mainCtx.fillRect(this.rocket.x - 3, this.rocket.y - 3, 6, 6);
+
+      if (progress >= 1 && !this.rocket.apexTriggered) {
+        this.rocket.apexTriggered = true;
+        const rx = this.rocket.targetX;
+        const ry = this.rocket.targetY;
+        const cb = this.rocket.onApex;
+        this.rocket = null;
+        this.apexSpark = { x: rx, y: ry, pulse: 0 };
+        if (typeof cb === 'function') cb(rx, ry);
+      }
+    }
+
+    // Apex Suspense Glow (0.15s)
+    if (this.apexSpark) {
+      this.apexSpark.pulse += 0.14;
+      const scale = 1 + Math.sin(this.apexSpark.pulse) * 0.35;
+      this.mainCtx.save();
+      this.mainCtx.fillStyle = 'rgba(255, 240, 200, 0.9)';
+      this.mainCtx.beginPath();
+      this.mainCtx.arc(this.apexSpark.x, this.apexSpark.y, 5.5 * scale, 0, Math.PI * 2);
+      this.mainCtx.fill();
+      this.mainCtx.fillStyle = '#ffffff';
+      this.mainCtx.fillRect(this.apexSpark.x - 2, this.apexSpark.y - 2, 4, 4);
+      this.mainCtx.restore();
+    }
+
+    // 4. Explosion Lifecycle Coordinator (1.35s bloom reveal)
+    if (this.explosionState) {
+      const expElapsed = now - this.explosionState.startTime;
+
+      if (expElapsed >= 1350 && !this.explosionState.lockedTriggered) {
+        this.explosionState.lockedTriggered = true;
+        if (typeof this.explosionState.onLocked === 'function') {
+          this.explosionState.onLocked();
+        }
+      }
+
+      if (this.explosionState.lockedTriggered && now - this.lastBackgroundBurst > 1200) {
+        this.lastBackgroundBurst = now;
+        this.spawnBackgroundBurst();
+      }
+    }
+
+    // 5. Update Stars (Air Drag & Gravity Physics + Spark Shedding)
+    const dt = 16.6;
+    let crackleTriggered = false;
+
+    // Group active stars by color code for batched single-pass rendering
+    const starColorGroups = {};
+    GALA_FIREWORK_COLORS.forEach(c => starColorGroups[c] = []);
+
+    for (let i = this.stars.length - 1; i >= 0; i--) {
+      const star = this.stars[i];
+      star.life -= dt;
+
+      if (star.life <= 0) {
+        this.stars.splice(i, 1);
+        this.releaseStar(star);
         continue;
       }
 
-      this.ctx.save();
-      this.ctx.globalAlpha = Math.max(0, p.opacity);
+      star.prevX = star.x;
+      star.prevY = star.y;
+      star.x += star.vx;
+      star.y += star.vy;
+      star.vx *= star.drag;
+      star.vy *= star.drag;
+      star.vy += star.gravity;
 
-      if (p.type === 'spark') {
-        this.ctx.fillStyle = p.color;
-        this.ctx.shadowColor = p.color;
-        this.ctx.shadowBlur = 8;
-        this.ctx.beginPath();
-        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        this.ctx.fill();
-      } else {
-        p.vx *= 0.98;
-        p.rotation += p.rotSpeed;
-        this.ctx.translate(p.x, p.y);
-        this.ctx.rotate((p.rotation * Math.PI) / 180);
-        this.ctx.fillStyle = p.color;
-        this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+      // Continuous Kamuro Spark Shedding
+      if (star.sparkFreq > 0 && this.sparks.length < 1500) {
+        star.sparkTimer += dt;
+        if (star.sparkTimer >= star.sparkFreq) {
+          star.sparkTimer = 0;
+          const sp = this.obtainSpark();
+          sp.x = star.x;
+          sp.y = star.y;
+          sp.prevX = star.prevX;
+          sp.prevY = star.prevY;
+          const spAngle = Math.random() * Math.PI * 2;
+          const spSpeed = Math.random() * star.sparkSpeed;
+          sp.vx = star.vx * 0.35 + Math.cos(spAngle) * spSpeed;
+          sp.vy = star.vy * 0.35 + Math.sin(spAngle) * spSpeed;
+          sp.color = star.sparkColor;
+          sp.life = Math.random() * 450 + 400;
+          sp.maxLife = sp.life;
+          sp.drag = 0.90; // High drag forms glowing trailing dust
+          sp.gravity = 0.14;
+          this.sparks.push(sp);
+        }
       }
 
-      this.ctx.restore();
+      // Crackle / Dragon Eggs Effect at end of life
+      if (star.isCrackle && !star.hasCrackled && star.life < star.maxLife * 0.3) {
+        star.hasCrackled = true;
+        crackleTriggered = true;
+        if (this.sparks.length < 1300) {
+          for (let k = 0; k < 6; k++) {
+            const cAngle = Math.random() * Math.PI * 2;
+            const cSpeed = Math.random() * 4.2 + 1.8;
+            const sp = this.obtainSpark();
+            sp.x = star.x;
+            sp.y = star.y;
+            sp.prevX = star.x;
+            sp.prevY = star.y;
+            sp.vx = Math.cos(cAngle) * cSpeed;
+            sp.vy = Math.sin(cAngle) * cSpeed;
+            sp.color = Math.random() > 0.5 ? '#ffffff' : '#ffd700';
+            sp.life = Math.random() * 280 + 160;
+            sp.maxLife = sp.life;
+            sp.drag = 0.89;
+            sp.gravity = 0.08;
+            this.sparks.push(sp);
+          }
+        }
+      }
+
+      if (!starColorGroups[star.color]) {
+        starColorGroups[star.color] = [];
+      }
+      starColorGroups[star.color].push(star);
     }
 
-    if (this.particles.length > 0) {
-      this.animId = requestAnimationFrame(() => this.render());
-    } else {
-      this.animId = null;
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    if (crackleTriggered && window.__galaAudio) {
+      window.__galaAudio.playCrackle();
     }
+
+    // 6. Update Sparks (The Falling Golden Willow Stardust)
+    const sparkColorGroups = {};
+    for (let i = this.sparks.length - 1; i >= 0; i--) {
+      const sp = this.sparks[i];
+      sp.life -= dt;
+
+      if (sp.life <= 0) {
+        this.sparks.splice(i, 1);
+        this.releaseSpark(sp);
+        continue;
+      }
+
+      sp.prevX = sp.x;
+      sp.prevY = sp.y;
+      sp.x += sp.vx;
+      sp.y += sp.vy;
+      sp.vx *= sp.drag;
+      sp.vy *= sp.drag;
+      sp.vy += sp.gravity;
+
+      if (!sparkColorGroups[sp.color]) {
+        sparkColorGroups[sp.color] = [];
+      }
+      sparkColorGroups[sp.color].push(sp);
+    }
+
+    // 7. Render Trails on Trails Canvas (Batched by Color -> Zero CPU Stutter)
+    if (this.trailsCtx) {
+      // Draw Stars (Thick incandescent ribbons)
+      for (const color in starColorGroups) {
+        const group = starColorGroups[color];
+        if (group.length === 0) continue;
+
+        this.trailsCtx.strokeStyle = color;
+        this.trailsCtx.lineWidth = 3.8;
+        this.trailsCtx.beginPath();
+        for (let i = 0; i < group.length; i++) {
+          const s = group[i];
+          this.trailsCtx.moveTo(s.x, s.y);
+          this.trailsCtx.lineTo(s.prevX, s.prevY);
+        }
+        this.trailsCtx.stroke();
+      }
+
+      // Draw Sparks (Kamuro Willow Silk Droplets)
+      for (const color in sparkColorGroups) {
+        const group = sparkColorGroups[color];
+        if (group.length === 0) continue;
+
+        this.trailsCtx.strokeStyle = color;
+        this.trailsCtx.lineWidth = 1.8;
+        this.trailsCtx.beginPath();
+        for (let i = 0; i < group.length; i++) {
+          const sp = group[i];
+          this.trailsCtx.moveTo(sp.x, sp.y);
+          this.trailsCtx.lineTo(sp.prevX, sp.prevY);
+        }
+        this.trailsCtx.stroke();
+      }
+    }
+
+    // 8. Render White-Hot Star Heads on Main Canvas (Incandescent Tip Streaks)
+    this.mainCtx.strokeStyle = '#ffffff';
+    this.mainCtx.lineWidth = 2.0;
+    this.mainCtx.beginPath();
+    for (let i = 0; i < this.stars.length; i++) {
+      const s = this.stars[i];
+      this.mainCtx.moveTo(s.x, s.y);
+      this.mainCtx.lineTo(s.prevX, s.prevY);
+    }
+    this.mainCtx.stroke();
+
+    this.mainCtx.restore();
+    this.animId = requestAnimationFrame(() => this.loop());
   }
 }
 
-// ================= CELESTIAL FIREWORK PHYSICS ENGINE (MODE 4) =================
-// Authentic Multi-Colored Pyrotechnic Blast with High-Contrast Diamond-Gold Typography
-class CelestialFireworkEngine {
+
+// ================= ROYAL GOLD GALA CONFETTI ENGINE =================
+class RoyalGoldConfettiEngine {
   constructor(canvasId) {
     this.canvasId = canvasId;
     this.canvas = null;
     this.ctx = null;
-    this.stars = [];
-    this.particles = [];
-    this.smokeClouds = [];
-    this.shockwaves = [];
-    this.rocket = null;
-    this.apexSpark = null;
+    this.pieces = [];
     this.animId = null;
-    this.cameraSpeed = 0;
-    this.screenShake = 0;
-    this.launchMuzzleX = 0;
-    this.launchMuzzleY = 0;
-    this.explosionState = null;
-    this.flashAlpha = 0;
-    this.groundFlashAlpha = 0;
-    this.textInfo = null;
-    this.textAlpha = 0;
-    this.lastBackgroundBurst = 0;
-
+    this.isActive = false;
     this.ensureCanvas();
-    window.addEventListener('resize', () => {
-      this.resize();
-      this.initStars();
-    });
+    window.addEventListener('resize', () => this.resize());
   }
 
   ensureCanvas() {
     if (!this.canvas || !this.ctx || !document.contains(this.canvas)) {
       this.canvas = document.getElementById(this.canvasId);
       this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
-      if (this.canvas) {
-        this.resize();
-        if (this.stars.length === 0) {
-          this.initStars();
-        }
-      }
+      if (this.canvas) this.resize();
     }
     return !!(this.canvas && this.ctx);
   }
@@ -833,333 +1045,62 @@ class CelestialFireworkEngine {
     this.canvas.height = window.innerHeight;
   }
 
-  initStars() {
-    this.stars = [];
-    const count = 160;
-    const w = window.innerWidth || 1920;
-    const h = window.innerHeight || 1080;
-    for (let i = 0; i < count; i++) {
-      this.stars.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        size: Math.random() * 1.8 + 0.6,
-        baseAlpha: Math.random() * 0.7 + 0.3,
-        twinkleSpeed: Math.random() * 0.04 + 0.01,
-        twinklePhase: Math.random() * Math.PI * 2,
-        speedFactor: Math.random() * 0.8 + 0.4
-      });
-    }
-  }
-
-  // 1. Mortar Tube Launch & Rocket Ejection
-  launchRocket(startX, startY, targetX, targetY, durationMs, onApex, onExplode) {
+  burst(count = 150) {
     if (!this.ensureCanvas()) return;
-    this.launchMuzzleX = startX;
-    this.launchMuzzleY = startY;
+    this.pieces = [];
+    this.isActive = true;
 
-    this.rocket = {
-      baseX: startX,
-      x: startX,
-      y: startY,
-      startX,
-      startY,
-      targetX,
-      targetY,
-      startTime: performance.now(),
-      duration: durationMs,
-      history: [],
-      onApex,
-      onExplode,
-      apexTriggered: false
-    };
-    this.cameraSpeed = 0;
-    this.textAlpha = 0;
-    this.textInfo = null;
-
-    // A. Visceral Camera Shudder (炮口后坐力屏幕震颤)
-    this.screenShake = 8.0;
-
-    // B. Intense Mortar Muzzle Lift Flash (底火爆炸白金火光)
-    this.groundFlashAlpha = 1.0;
-
-    // C. High-velocity fountain of lift propellant sparks (出膛冲天炽热火星)
-    const liftSparks = 85;
-    for (let i = 0; i < liftSparks; i++) {
-      const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.42;
-      const speed = Math.random() * 22 + 10;
-      this.particles.push({
-        x: startX + (Math.random() - 0.5) * 14,
-        y: startY + (Math.random() - 0.5) * 4,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        color: Math.random() > 0.35 ? '#ffffff' : (Math.random() > 0.5 ? '#fef08a' : '#ff9800'),
-        size: Math.random() * 2.5 + 1.2,
-        alpha: 1.0,
-        decay: 1.0 / (Math.random() * 24 + 18),
-        drag: 0.91,
-        gravity: 0.28,
-        isText: false,
-        trail: [],
-        maxTrail: 3
-      });
-    }
-
-    // D. Billowing Toroidal Smoke Ring Puff from Muzzle
-    for (let i = 0; i < 22; i++) {
-      const sAngle = Math.random() * Math.PI * 2;
-      const sDist = Math.random() * 12;
-      this.smokeClouds.push({
-        x: startX + Math.cos(sAngle) * sDist,
-        y: startY + Math.sin(sAngle) * (sDist * 0.35) - 4,
-        vx: Math.cos(sAngle) * (Math.random() * 2.8 + 0.8),
-        vy: -Math.random() * 4.5 - 1.5,
-        radius: Math.random() * 14 + 10,
-        growth: Math.random() * 0.45 + 0.35,
-        alpha: 0.55,
-        decay: 0.012,
-        color: Math.random() > 0.5 ? 'rgba(230, 215, 195,' : 'rgba(180, 168, 155,'
-      });
-    }
-
-    if (!this.animId) this.loop();
-  }
-
-  // Sample target points for name from off-screen canvas with high stroke density
-  sampleTextPoints(text, targetCenterY) {
-    const w = window.innerWidth || 1920;
-    const h = window.innerHeight || 1080;
-    const offCanvas = document.createElement('canvas');
-    offCanvas.width = w;
-    offCanvas.height = h;
-    const offCtx = offCanvas.getContext('2d');
-    if (!offCtx) return { points: [], fontSize: 72, textY: targetCenterY };
-
-    // Dynamically calculate font size based on text length and screen width
-    const maxTextWidth = Math.min(w * 0.82, 1100);
-    let fontSize = 72;
-    if (text.length > 20) fontSize = 44;
-    else if (text.length > 15) fontSize = 52;
-    else if (text.length > 11) fontSize = 62;
-
-    // Use a clean, robust, ultra-bold font with elegant letter spacing
-    offCtx.font = `800 ${fontSize}px "Plus Jakarta Sans", "Inter", -apple-system, sans-serif`;
-    offCtx.letterSpacing = '3.5px';
-    let measuredWidth = offCtx.measureText(text.toUpperCase()).width;
-    if (measuredWidth > maxTextWidth) {
-      fontSize = Math.floor(fontSize * (maxTextWidth / measuredWidth));
-      offCtx.font = `800 ${fontSize}px "Plus Jakarta Sans", "Inter", -apple-system, sans-serif`;
-    }
-
-    offCtx.fillStyle = '#ffffff';
-    offCtx.textAlign = 'center';
-    offCtx.textBaseline = 'middle';
-    offCtx.fillText(text.toUpperCase(), w / 2, targetCenterY);
-
-    const imgData = offCtx.getImageData(0, 0, w, h);
-    const pixels = imgData.data;
-    const points = [];
-
-    // High-efficiency starlight sampling: 3.6px yields ~650 crisp diamond-starlight coordinates at 60 FPS
-    const step = 3.6;
-    const startY = Math.max(0, Math.floor(targetCenterY - fontSize * 0.85));
-    const endY = Math.min(h, Math.floor(targetCenterY + fontSize * 0.85));
-    const startX = Math.max(0, Math.floor((w - maxTextWidth) / 2));
-    const endX = Math.min(w, Math.floor((w + maxTextWidth) / 2));
-
-    for (let py = startY; py < endY; py += step) {
-      const iy = Math.floor(py);
-      for (let px = startX; px < endX; px += step) {
-        const ix = Math.floor(px);
-        const idx = (iy * w + ix) * 4;
-        if (pixels[idx + 3] > 115) {
-          points.push({
-            tx: ix,
-            ty: iy,
-            tz: (Math.random() - 0.5) * 20
-          });
-        }
-      }
-    }
-    return { points, fontSize, textY: targetCenterY, text: text.toUpperCase() };
-  }
-
-  createExplosion(x, y, nameText, onMorphStart, onLocked) {
-    if (!this.ensureCanvas()) return;
-    this.apexSpark = null;
-    this.rocket = null;
-
-    // 1. Initial Detonation Supernova Flash, Mach Shockwave & Heavy Screen Shudder
-    this.flashAlpha = 1.0;
-    this.screenShake = 14.0;
-    this.shockwaves.push({
-      x,
-      y,
-      radius: 12,
-      maxRadius: Math.min(window.innerWidth || 1920, window.innerHeight || 1080) * 0.5,
-      speed: 24,
-      alpha: 0.95
-    });
-
-    this.particles = [];
-    const now = performance.now();
-
-    // 2. Supernova Core: Blinding Diamond Starlight Sparks
-    const CORE_COLORS = ['#ffffff', '#ffffff', '#fffbeb', '#fef08a', '#fde047', '#ffd700'];
-    const coreCount = 140;
-    for (let i = 0; i < coreCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 14.0 + 3.5;
-      const color = CORE_COLORS[i % CORE_COLORS.length];
-      this.particles.push({
-        x,
-        y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        color,
-        size: Math.random() * 1.5 + 1.2,
-        alpha: 1.0,
-        decay: 1.0 / (Math.random() * 45 + 50),
-        drag: 0.955,
-        gravity: 0.035,
-        trail: [],
-        maxTrail: 3
-      });
-    }
-
-    // 3. Multi-Colored Peony Stars
-    const SHELL_COLORS = [
-      '#ff2a6d', '#ff5252', '#f43f5e', // Strontium Ruby
-      '#00f5a0', '#10b981', '#34d399', // Barium Emerald
-      '#00e5ff', '#38bdf8', '#0284c7', // Copper Electric Cyan
-      '#c084fc', '#d946ef', '#a855f7', // Potassium Royal Violet
-      '#fbbf24', '#f59e0b', '#fef08a'  // Sodium Imperial Amber
+    const CONFETTI_COLORS = [
+      '#ffffff', '#f8fafc', '#e2e8f0', '#cbd5e1', // Pure Diamond White & Platinum Silver
+      '#38bdf8', '#7dd3fc',                         // Electric Concert Stage Cyan
+      '#818cf8', '#a5b4fc', '#c084fc',             // Laser Violet & Holographic Prism
+      '#ffffff', '#f1f5f9'                         // Brilliant High-Gloss White
     ];
-    const outerCount = 130;
-    for (let i = 0; i < outerCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 17.0 + 6.0;
-      const color = SHELL_COLORS[i % SHELL_COLORS.length];
-      this.particles.push({
-        x,
-        y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        color,
-        size: Math.random() * 2.0 + 1.5,
-        alpha: 1.0,
-        decay: 1.0 / (Math.random() * 60 + 65),
-        drag: 0.962,
-        gravity: 0.048,
-        trail: [],
-        maxTrail: 4
-      });
-    }
 
-    // 4. Golden Brocade Kamuro Willows
-    const willowCount = 60;
-    for (let i = 0; i < willowCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 9.5 + 3.0;
-      this.particles.push({
-        x,
-        y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 2.5,
-        color: Math.random() > 0.3 ? '#fef08a' : '#ffd700',
-        size: Math.random() * 2.0 + 1.4,
-        alpha: 1.0,
-        decay: 1.0 / (Math.random() * 90 + 90),
-        drag: 0.97,
-        gravity: 0.075,
-        trail: [],
-        maxTrail: 5
-      });
-    }
-
-    // 5. Dragon's Egg Crackling Micro-Salutes
-    const crackleCount = 30;
-    for (let i = 0; i < crackleCount; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 13.0 + 4.0;
-      this.particles.push({
-        x,
-        y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        color: '#ffffff',
-        size: 1.5,
-        alpha: 1.0,
-        decay: 1.0 / (Math.random() * 45 + 40),
-        drag: 0.955,
-        gravity: 0.05,
-        isCrackle: true,
-        crackleTime: now + (Math.random() * 350 + 250),
-        hasCrackled: false,
-        trail: [],
-        maxTrail: 3
-      });
-    }
-
-    // Lifecycle Coordinator
-    this.explosionState = {
-      startTime: now,
-      onMorphStart,
-      onLocked,
-      lockedTriggered: false
-    };
-
-    this.lastBackgroundBurst = now;
-    if (!this.animId) this.loop();
-  }
-
-  // Spawn gentle celebratory mini-peonies in the distant background
-  spawnBackgroundBurst() {
-    const w = this.canvas ? this.canvas.width : 1920;
-    const h = this.canvas ? this.canvas.height : 1080;
-    const bx = Math.random() > 0.5 ? (Math.random() * (w * 0.22) + w * 0.06) : (w - Math.random() * (w * 0.22) - w * 0.06);
-    const by = Math.random() * (h * 0.35) + 60;
-
-    const MINI_COLORS = ['#ff2a6d', '#00f5a0', '#00e5ff', '#c084fc', '#fbbf24', '#ffffff'];
-    const burstColor = MINI_COLORS[Math.floor(Math.random() * MINI_COLORS.length)];
-    const count = 55;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
 
     for (let i = 0; i < count; i++) {
+      const isRibbon = Math.random() > 0.35;
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 5.8 + 1.8;
-      this.particles.push({
-        x: bx,
-        y: by,
+      const speed = Math.random() * 15 + 7;
+
+      this.pieces.push({
+        x: w / 2 + (Math.random() - 0.5) * 120,
+        y: h * 0.30 + (Math.random() - 0.5) * 80,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        color: burstColor,
-        size: Math.random() * 1.6 + 1.2,
-        alpha: 1.0,
-        decay: 1.0 / (Math.random() * 50 + 55),
-        drag: 0.965,
-        gravity: 0.045,
-        isText: false,
-        trail: [],
-        maxTrail: 4
+        vy: Math.sin(angle) * speed - (Math.random() * 7 + 4),
+        gravity: 0.11 + Math.random() * 0.07,
+        drag: 0.94 + Math.random() * 0.02,
+        w: isRibbon ? Math.random() * 10 + 8 : Math.random() * 6 + 4,
+        h: isRibbon ? Math.random() * 18 + 10 : Math.random() * 6 + 4,
+        tilt: Math.random() * Math.PI,
+        tiltSpeed: Math.random() * 0.12 + 0.04,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.08,
+        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+        opacity: 1.0,
+        decay: Math.random() * 0.002 + 0.001,
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: Math.random() * 0.05 + 0.02,
+        isRibbon
       });
+    }
+
+    if (!this.animId) {
+      this.loop();
     }
   }
 
   clear() {
-    this.ensureCanvas();
-    this.particles = [];
-    this.smokeClouds = [];
-    this.shockwaves = [];
-    this.rocket = null;
-    this.apexSpark = null;
-    this.cameraSpeed = 0;
-    this.screenShake = 0;
-    this.explosionState = null;
-    this.flashAlpha = 0;
-    this.groundFlashAlpha = 0;
-    this.textInfo = null;
-    this.textAlpha = 0;
+    this.pieces = [];
+    this.isActive = false;
     if (this.ctx && this.canvas) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    if (this.animId) {
+      cancelAnimationFrame(this.animId);
+      this.animId = null;
     }
   }
 
@@ -1168,443 +1109,66 @@ class CelestialFireworkEngine {
       this.animId = null;
       return;
     }
+
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;
-    const now = performance.now();
 
     ctx.clearRect(0, 0, w, h);
 
-    // Apply Camera Screen Shudder (Recoil impulse from lift & explosion)
-    ctx.save();
-    if (this.screenShake > 0.05) {
-      const shakeX = (Math.random() - 0.5) * this.screenShake;
-      const shakeY = (Math.random() - 0.5) * this.screenShake;
-      ctx.translate(shakeX, shakeY);
-      this.screenShake *= 0.82;
+    if (this.pieces.length === 0) {
+      this.animId = null;
+      this.isActive = false;
+      return;
     }
 
-    // 1. Draw Starfield with Vertical Camera Parallax (Zero-overhead 60FPS)
-    for (const star of this.stars) {
-      star.y += this.cameraSpeed * star.speedFactor;
-      if (star.y > h) star.y -= h;
-      if (star.y < 0) star.y += h;
-
-      const twinkle = Math.sin(now * star.twinkleSpeed + star.twinklePhase);
-      const alpha = Math.max(0.12, star.baseAlpha + twinkle * 0.28);
-
-      if (this.cameraSpeed > 2) {
-        ctx.lineWidth = star.size;
-        ctx.strokeStyle = `rgba(254, 240, 138, ${alpha * 0.75})`;
-        ctx.beginPath();
-        ctx.moveTo(star.x, star.y);
-        ctx.lineTo(star.x, star.y + this.cameraSpeed * star.speedFactor * 3.5);
-        ctx.stroke();
-      } else {
-        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    // 2. Render Ground Mortar Lift Flash (Illuminates from the exact mortar muzzle rim)
-    if (this.groundFlashAlpha > 0.01) {
-      ctx.save();
-      const gx = this.launchMuzzleX || (w / 2);
-      const gy = this.launchMuzzleY || (h - 40);
-      const gGrad = ctx.createRadialGradient(
-        gx, gy, 6, 
-        gx, gy, w * 0.55
-      );
-      gGrad.addColorStop(0, `rgba(255, 255, 255, ${this.groundFlashAlpha})`);
-      gGrad.addColorStop(0.2, `rgba(254, 240, 138, ${this.groundFlashAlpha * 0.85})`);
-      gGrad.addColorStop(0.55, `rgba(245, 158, 11, ${this.groundFlashAlpha * 0.4})`);
-      gGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = gGrad;
-      ctx.fillRect(0, 0, w, h);
-      ctx.restore();
-      this.groundFlashAlpha *= 0.83;
-    }
-
-    // 3. Render Smoke Clouds (Linger and expand organically)
-    for (let i = this.smokeClouds.length - 1; i >= 0; i--) {
-      const s = this.smokeClouds[i];
-      s.x += s.vx;
-      s.y += s.vy;
-      s.radius += s.growth;
-      s.alpha -= s.decay;
-
-      if (s.alpha <= 0) {
-        this.smokeClouds.splice(i, 1);
-        continue;
-      }
-
-      ctx.save();
-      const smokeGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.radius);
-      smokeGrad.addColorStop(0, `${s.color}${s.alpha})`);
-      smokeGrad.addColorStop(0.6, `${s.color}${s.alpha * 0.5})`);
-      smokeGrad.addColorStop(1, `${s.color}0)`);
-      ctx.fillStyle = smokeGrad;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // 4. Render Shockwaves (Mach Detonation Blast Rings)
-    for (let i = this.shockwaves.length - 1; i >= 0; i--) {
-      const sw = this.shockwaves[i];
-      sw.radius += sw.speed;
-      sw.speed *= 0.94; // rapid deceleration
-      sw.alpha *= 0.88;
-
-      if (sw.alpha <= 0.02 || sw.radius >= sw.maxRadius) {
-        this.shockwaves.splice(i, 1);
-        continue;
-      }
-
-      ctx.save();
-      // Outer soft shockwave ring
-      ctx.strokeStyle = `rgba(254, 240, 138, ${sw.alpha * 0.35})`;
-      ctx.lineWidth = Math.max(2, 8 * (1 - sw.radius / sw.maxRadius));
-      ctx.beginPath();
-      ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Inner crisp high-energy shockwave ring
-      ctx.strokeStyle = `rgba(255, 255, 255, ${sw.alpha * 0.9})`;
-      ctx.lineWidth = Math.max(1, 3 * (1 - sw.radius / sw.maxRadius));
-      ctx.beginPath();
-      ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // 5. Render Rocket & Thick Incandescent Burning Comet Tail
-    if (this.rocket) {
-      const elapsed = now - this.rocket.startTime;
-      const progress = Math.min(1, elapsed / this.rocket.duration);
-
-      // Physics-based ascent: starts fast from lift charge, curves upward against gravity
-      const easeY = 1 - Math.pow(1 - progress, 2.8);
-      // Aerodynamic organic corkscrew weave
-      const weave = Math.sin(progress * 26) * 3.2 * (1 - progress * 0.6);
-      this.rocket.x = this.rocket.baseX + (this.rocket.targetX - this.rocket.baseX) * progress + weave;
-      this.rocket.y = this.rocket.startY + (this.rocket.targetY - this.rocket.startY) * easeY;
-      this.cameraSpeed = Math.sin(progress * Math.PI) * 18;
-
-      // Update rocket path history for continuous tapered incandescent ribbon
-      if (!this.rocket.history) this.rocket.history = [];
-      this.rocket.history.unshift({ x: this.rocket.x, y: this.rocket.y });
-      if (this.rocket.history.length > 20) this.rocket.history.pop();
-
-      // CONTINUOUS TAPERED INCANDESCENT COMET TAIL RIBBON:
-      if (this.rocket.history.length > 1) {
-        ctx.save();
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        // Ribbon Layer 1: Radiant Outer Amber Glare
-        for (let i = 0; i < this.rocket.history.length - 1; i++) {
-          const p1 = this.rocket.history[i];
-          const p2 = this.rocket.history[i + 1];
-          const t = 1 - (i / this.rocket.history.length);
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(245, 158, 11, ${t * 0.45})`;
-          ctx.lineWidth = Math.max(1, t * 24);
-          ctx.stroke();
-        }
-
-        // Ribbon Layer 2: Incandescent Golden Burning Flame Column
-        for (let i = 0; i < this.rocket.history.length - 1; i++) {
-          const p1 = this.rocket.history[i];
-          const p2 = this.rocket.history[i + 1];
-          const t = 1 - (i / this.rocket.history.length);
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(254, 240, 138, ${t * 0.88})`;
-          ctx.lineWidth = Math.max(1, t * 11);
-          ctx.stroke();
-        }
-
-        // Ribbon Layer 3: Blinding White-Hot Titanium Center Jet
-        for (let i = 0; i < this.rocket.history.length - 1; i++) {
-          const p1 = this.rocket.history[i];
-          const p2 = this.rocket.history[i + 1];
-          const t = 1 - (i / this.rocket.history.length);
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(255, 255, 255, ${t * 1.0})`;
-          ctx.lineWidth = Math.max(0.8, t * 4.0);
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
-
-      // Cascading titanium jet sparks spraying downward behind rocket (14 particles/frame)
-      const jetCount = 14;
-      for (let i = 0; i < jetCount; i++) {
-        const jetAngle = Math.PI / 2 + (Math.random() - 0.5) * 0.38;
-        const jetSpeed = Math.random() * 9 + 5;
-        const color = Math.random() > 0.4 ? '#ffffff' : (Math.random() > 0.5 ? '#fff9db' : '#fef08a');
-        this.particles.push({
-          x: this.rocket.x + (Math.random() - 0.5) * 4,
-          y: this.rocket.y + 6 + Math.random() * 6,
-          vx: Math.cos(jetAngle) * jetSpeed,
-          vy: Math.sin(jetAngle) * jetSpeed,
-          color,
-          size: Math.random() * 2.2 + 1.2,
-          alpha: 1.0,
-          decay: 0.045 + Math.random() * 0.03,
-          drag: 0.93,
-          gravity: 0.08,
-          isText: false,
-          trail: [],
-          maxTrail: 3
-        });
-      }
-
-      // Outer sparkling gold spray (8 particles/frame)
-      for (let i = 0; i < 8; i++) {
-        this.particles.push({
-          x: this.rocket.x + (Math.random() - 0.5) * 6,
-          y: this.rocket.y + 10 + Math.random() * 8,
-          vx: (Math.random() - 0.5) * 5.0,
-          vy: Math.random() * 5 + 3,
-          color: Math.random() > 0.3 ? '#ffd700' : '#ff9800',
-          size: Math.random() * 1.5 + 0.8,
-          alpha: 0.9,
-          decay: 0.05 + Math.random() * 0.035,
-          drag: 0.94,
-          gravity: 0.06,
-          isText: false,
-          trail: [],
-          maxTrail: 2
-        });
-      }
-
-      // Translucent smoke puffs drifting behind rocket (every 2-3 frames)
-      if (Math.random() > 0.3) {
-        this.smokeClouds.push({
-          x: this.rocket.x + (Math.random() - 0.5) * 6,
-          y: this.rocket.y + 16,
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: Math.random() * 0.6 + 0.2,
-          radius: Math.random() * 7 + 5,
-          growth: 0.3,
-          alpha: 0.25,
-          decay: 0.007,
-          color: 'rgba(220, 210, 195,'
-        });
-      }
-
-      // Render Rocket Head (Incandescent Plasma Teardrop Flame)
-      ctx.save();
-      const headGrad = ctx.createRadialGradient(this.rocket.x, this.rocket.y, 2, this.rocket.x, this.rocket.y, 36);
-      headGrad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-      headGrad.addColorStop(0.25, 'rgba(254, 240, 138, 0.9)');
-      headGrad.addColorStop(0.6, 'rgba(245, 158, 11, 0.45)');
-      headGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
-      ctx.fillStyle = headGrad;
-      ctx.beginPath();
-      ctx.arc(this.rocket.x, this.rocket.y, 36, 0, Math.PI * 2);
-      ctx.fill();
-
-      // White-hot incandescent shell head
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(this.rocket.x, this.rocket.y, 4.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      if (progress >= 1 && !this.rocket.apexTriggered) {
-        this.rocket.apexTriggered = true;
-        const rx = this.rocket.targetX;
-        const ry = this.rocket.targetY;
-        const cb = this.rocket.onApex;
-        this.rocket = null;
-        this.cameraSpeed = 0;
-        this.apexSpark = { x: rx, y: ry, pulse: 0, startTime: now };
-        if (typeof cb === 'function') cb(rx, ry);
-      }
-    }
-
-    // 6. Render Apex Delay Fuse (0.7s Suspenseful Hot Ember Sizzle)
-    if (this.apexSpark) {
-      this.cameraSpeed *= 0.82;
-      this.apexSpark.pulse += 0.12;
-      const pScale = 1 + Math.sin(this.apexSpark.pulse) * 0.35;
-
-      ctx.save();
-      // Hot glowing ruby outer corona
-      ctx.fillStyle = 'rgba(255, 112, 67, 0.35)';
-      ctx.beginPath();
-      ctx.arc(this.apexSpark.x, this.apexSpark.y, 6.5 * pScale, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Glowing core delay fuse
-      ctx.fillStyle = '#ff7043';
-      ctx.beginPath();
-      ctx.arc(this.apexSpark.x, this.apexSpark.y, 3.2 * pScale, 0, Math.PI * 2);
-      ctx.fill();
-
-      // White-hot center pinprick
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(this.apexSpark.x, this.apexSpark.y, 1.8, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Tiny delay fuse sizzle sparks
-      if (Math.random() > 0.25) {
-        this.particles.push({
-          x: this.apexSpark.x + (Math.random() - 0.5) * 4,
-          y: this.apexSpark.y + (Math.random() - 0.5) * 4,
-          vx: (Math.random() - 0.5) * 2.2,
-          vy: (Math.random() - 0.5) * 2.2,
-          color: Math.random() > 0.5 ? '#fef08a' : '#ff9800',
-          size: 1.1,
-          alpha: 0.95,
-          decay: 0.05,
-          drag: 0.95,
-          gravity: 0.04,
-          isText: false,
-          trail: [],
-          maxTrail: 1
-        });
-      }
-      ctx.restore();
-    }
-
-    // 7. Detonation Shockwave Flash
-    if (this.flashAlpha > 0.01) {
-      ctx.save();
-      const flashGrad = ctx.createRadialGradient(w / 2, h * 0.42, 10, w / 2, h * 0.42, w * 0.7);
-      flashGrad.addColorStop(0, `rgba(255, 255, 255, ${this.flashAlpha})`);
-      flashGrad.addColorStop(0.35, `rgba(254, 240, 138, ${this.flashAlpha * 0.8})`);
-      flashGrad.addColorStop(0.7, `rgba(212, 175, 55, ${this.flashAlpha * 0.38})`);
-      flashGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = flashGrad;
-      ctx.fillRect(0, 0, w, h);
-      ctx.restore();
-      this.flashAlpha *= 0.88;
-    }
-
-    // 8. Explosion Lifecycle Coordinator
-    if (this.explosionState) {
-      const expElapsed = now - this.explosionState.startTime;
-
-      // 450ms into explosion: Trigger Swarm Sound
-      if (expElapsed >= 450 && !this.explosionState.morphTriggered) {
-        this.explosionState.morphTriggered = true;
-        if (typeof this.explosionState.onMorphStart === 'function') {
-          this.explosionState.onMorphStart();
-        }
-      }
-
-      // 1200ms into explosion: Trigger Grand Winner Reveal
-      if (expElapsed >= 1200 && !this.explosionState.lockedTriggered) {
-        this.explosionState.lockedTriggered = true;
-        if (typeof this.explosionState.onLocked === 'function') {
-          this.explosionState.onLocked();
-        }
-      }
-
-      // Continuous celebratory background mini-fireworks (every 1.6s)
-      if (this.explosionState.lockedTriggered && now - this.lastBackgroundBurst > 1600) {
-        this.lastBackgroundBurst = now;
-        this.spawnBackgroundBurst();
-      }
-    }
-
-    // 9. High-Performance Particle Rendering (Hardware Additive Blending 60 FPS)
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-
-    // Particle pool memory safety cap
-    if (this.particles.length > 1000) {
-      this.particles.splice(0, this.particles.length - 1000);
-    }
-
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      const p = this.particles[i];
-
-      // === Pyrotechnic Shell & Willow Particle Dynamics ===
+    for (let i = this.pieces.length - 1; i >= 0; i--) {
+      const p = this.pieces[i];
       p.vx *= p.drag;
       p.vy *= p.drag;
       p.vy += p.gravity;
-      p.x += p.vx;
+      p.wobble += p.wobbleSpeed;
+      p.x += p.vx + Math.sin(p.wobble) * 1.5;
       p.y += p.vy;
-      p.alpha -= p.decay;
+      p.tilt += p.tiltSpeed;
+      p.rotation += p.rotationSpeed;
 
-      p.trail.unshift({ x: p.x, y: p.y });
-      if (p.trail.length > p.maxTrail) p.trail.pop();
+      // Slowly fade when near bottom
+      if (p.y > h * 0.72) {
+        p.opacity -= 0.015;
+      }
 
-      // Handle Dragon's egg micro-burst
-      if (p.isCrackle && !p.hasCrackled && now >= p.crackleTime) {
-        p.hasCrackled = true;
-        // Spawn 3 micro bright flash embers
-        if (this.particles.length < 800) {
-          for (let k = 0; k < 3; k++) {
-            const cAngle = Math.random() * Math.PI * 2;
-            const cSpeed = Math.random() * 4.0 + 1.2;
-            this.particles.push({
-              x: p.x,
-              y: p.y,
-              vx: Math.cos(cAngle) * cSpeed,
-              vy: Math.sin(cAngle) * cSpeed,
-              color: Math.random() > 0.4 ? '#ffffff' : '#fef08a',
-              size: 1.2,
-              alpha: 1.0,
-              decay: 0.08,
-              drag: 0.92,
-              gravity: 0.06,
-              trail: [],
-              maxTrail: 1
-            });
-          }
-        }
-      if (p.alpha <= 0) {
-        this.particles.splice(i, 1);
+      if (p.y > h + 40 || p.opacity <= 0.01) {
+        this.pieces.splice(i, 1);
         continue;
       }
 
-        // Soft tapered fading streamer trail (Single continuous polyline)
-        if (p.trail.length > 1) {
-          ctx.strokeStyle = p.color;
-          ctx.lineCap = 'round';
-          ctx.globalAlpha = Math.max(0, p.alpha * 0.55);
-          ctx.lineWidth = Math.max(0.6, p.size * 0.75);
-          ctx.beginPath();
-          ctx.moveTo(p.trail[0].x, p.trail[0].y);
-          for (let t = 1; t < p.trail.length; t++) {
-            ctx.lineTo(p.trail[t].x, p.trail[t].y);
-          }
-          ctx.stroke();
-        }
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      ctx.scale(Math.cos(p.tilt), 1); // 3D tumbling paper flip
+      ctx.globalAlpha = Math.max(0, Math.min(1, p.opacity));
+      ctx.fillStyle = p.color;
 
-        // Outer colored halo
-        ctx.globalAlpha = Math.max(0, p.alpha * 0.4);
-        ctx.fillStyle = p.color;
+      if (p.isRibbon) {
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        // Highlight edge for metallic glint
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w * 0.35, p.h);
+      } else {
+        // Diamond sequin
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 1.8, 0, Math.PI * 2);
-        ctx.fill();
-
-        // White-hot star core
-        ctx.globalAlpha = Math.max(0, p.alpha);
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 0.75, 0, Math.PI * 2);
+        ctx.moveTo(0, -p.h / 2);
+        ctx.lineTo(p.w / 2, 0);
+        ctx.lineTo(0, p.h / 2);
+        ctx.lineTo(-p.w / 2, 0);
+        ctx.closePath();
         ctx.fill();
       }
-    }
-    ctx.restore();
 
-    ctx.restore();
+      ctx.restore();
+    }
+
     this.animId = requestAnimationFrame(() => this.loop());
   }
 }
@@ -1633,42 +1197,314 @@ const DEFAULT_EMPLOYEES = [
   { id: 'EMP-1988', name: 'Liam O\'Connor', department: 'Global Logistics', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=256&q=80' }
 ];
 
-const DEFAULT_AWARD = {
-  id: 'grand-prize',
-  title: 'Annual Grand Prize',
-  prizeName: 'MacBook Pro 16" M4 Max + Golden Trophy',
-  tierBadge: '★ SSR LEGENDARY WINNER ★'
+const DEFAULT_AWARDS = [
+  { id: 'grand', title: 'Grand Prize', prizeName: 'MacBook Pro 16" M4 Max', quota: 1, tierBadge: '★ SSR LEGENDARY ★' },
+  { id: 'first', title: '1st Prize', prizeName: 'iPhone 16 Pro Max 512GB', quota: 2, tierBadge: '★ SR EXCLUSIVE ★' },
+  { id: 'second', title: '2nd Prize', prizeName: 'iPad Pro 13" + Apple Pencil', quota: 5, tierBadge: '★ S LUXURY ★' },
+  { id: 'third', title: '3rd Prize', prizeName: 'Sony WH-1000XM5 Wireless Headphones', quota: 10, tierBadge: '★ PREMIUM SELECTION ★' },
+  { id: 'lucky', title: 'Lucky Prize', prizeName: 'Gala Deluxe Hamper / $100 Voucher', quota: 20, tierBadge: '★ LUCKY WINNER ★' }
+];
+
+const DEFAULT_TICKET_CONFIG = {
+  brandTitle: 'ANNUAL GALA VIP PASS',
+  admissionEyebrow: 'OFFICIAL WINNER ADMISSION',
+  stubTitle: 'OFFICIAL CLAIM STUB',
+  venue: 'CELESTIAL HALL',
+  eventDate: '2026.09.29',
+  securityStamp: 'VERIFIED',
+  securityBadge: '★ AUTHENTICATED ★'
 };
 
 // ================= VUE 3 APPLICATION MOUNT =================
-const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, watch, onMounted } = Vue;
 
 const app = createApp({
   setup() {
-    // Current Active Demo Mode: 'pack' | 'reel' | 'wheel' | 'firework'
-    const currentMode = ref('pack');
     const isMuted = ref(false);
+    const isFullscreen = ref(false);
 
-    // Common Data Pool
+    // Candidates Pool & Winners History State
     const candidatePool = ref([...DEFAULT_EMPLOYEES]);
-    const currentAward = ref(DEFAULT_AWARD);
-    const reelTrackItems = ref([...DEFAULT_EMPLOYEES]);
-    const wheelCandidates = ref([...DEFAULT_EMPLOYEES]);
-    const fireworkCandidates = ref([...DEFAULT_EMPLOYEES]);
+    const winnersHistory = ref([]);
+
+    // ================= TOAST NOTIFICATION SYSTEM =================
+    const toastMessage = ref('');
+    const toastType = ref('info'); // 'info' | 'success' | 'warning'
+    let toastTimer = null;
+
+    const showToast = (msg, type = 'info') => {
+      toastMessage.value = msg;
+      toastType.value = type;
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toastMessage.value = '';
+      }, 3200);
+    };
+
+    // ================= PRIZE TIERS & AWARD STATE =================
+    const savedAwards = localStorage.getItem('gala_awards_config');
+    const awards = ref(savedAwards ? JSON.parse(savedAwards) : JSON.parse(JSON.stringify(DEFAULT_AWARDS)));
+    const currentAwardId = ref('first'); // Default to 1st Prize
+    const isAwardModalOpen = ref(false);
+    const activeSettingsTab = ref('tiers'); // 'tiers' | 'ticket'
+
+    watch(awards, (newVal) => {
+      localStorage.setItem('gala_awards_config', JSON.stringify(newVal));
+    }, { deep: true });
+
+    // ================= VIP GOLDEN TICKET CUSTOMIZATION =================
+    const savedTicketConfig = localStorage.getItem('gala_ticket_config');
+    const ticketConfig = ref(savedTicketConfig ? JSON.parse(savedTicketConfig) : { ...DEFAULT_TICKET_CONFIG });
+
+    watch(ticketConfig, (newVal) => {
+      localStorage.setItem('gala_ticket_config', JSON.stringify(newVal));
+    }, { deep: true });
+
+    const resetTicketConfig = () => {
+      ticketConfig.value = { ...DEFAULT_TICKET_CONFIG };
+      showToast('Reset golden ticket titles to default.', 'info');
+    };
+
+    const currentAward = computed(() => {
+      return awards.value.find(a => a.id === currentAwardId.value) || awards.value[0] || {
+        id: 'custom',
+        title: 'Special Award',
+        prizeName: 'Mystery Gala Prize',
+        quota: 1,
+        tierBadge: '★ LUCKY WINNER ★'
+      };
+    });
+
+    const isAwardFilled = (awardId) => {
+      const target = awards.value.find(a => a.id === awardId);
+      if (!target) return false;
+      return getAwardWinnersCount(awardId) >= target.quota;
+    };
+
+    const getAwardWinnersCount = (awardId) => {
+      return winnersHistory.value.filter(w => w.awardId === awardId).length;
+    };
+
+    const openAwardModal = () => {
+      isAwardModalOpen.value = true;
+    };
+
+    const closeAwardModal = () => {
+      isAwardModalOpen.value = false;
+    };
+
+    const selectAward = (id) => {
+      currentAwardId.value = id;
+      const target = awards.value.find(a => a.id === id);
+      if (target) {
+        showToast(`Switched to: ${target.title} (${target.prizeName}, Quota: ${target.quota})`, 'info');
+      }
+    };
+
+    const addNewAward = () => {
+      const newId = 'award-' + Date.now();
+      awards.value.push({
+        id: newId,
+        title: `Tier ${awards.value.length + 1}`,
+        prizeName: 'Exciting Prize',
+        quota: 3,
+        tierBadge: '★ SPECIAL AWARD ★'
+      });
+      currentAwardId.value = newId;
+      showToast('Added new prize tier. Customize title and quota on the card.', 'success');
+    };
+
+    const removeAward = (id) => {
+      if (awards.value.length <= 1) {
+        showToast('Please maintain at least one prize tier.', 'warning');
+        return;
+      }
+      const idx = awards.value.findIndex(a => a.id === id);
+      if (idx !== -1) {
+        awards.value.splice(idx, 1);
+        if (currentAwardId.value === id) {
+          currentAwardId.value = awards.value[0].id;
+        }
+        showToast('Prize tier removed.', 'info');
+      }
+    };
+
+    // ================= BATCH DRAW MULTI-WINNER STATE & QUOTA CONSTRAINTS =================
+    const drawCount = ref(1);
+
+    // Remaining quota for currently selected award
+    const remainingAwardQuota = computed(() => {
+      const won = getAwardWinnersCount(currentAward.value.id);
+      return Math.max(0, currentAward.value.quota - won);
+    });
+
+    // Maximum allowed draw count for current award tier (strictly <= remaining quota)
+    const maxDrawCountAllowed = computed(() => {
+      const rem = remainingAwardQuota.value;
+      const poolLen = candidatePool.value.length;
+      if (rem <= 0) return 1;
+      return Math.max(1, Math.min(rem, poolLen));
+    });
+
+    // Auto-clamp drawCount whenever current award or remaining quota changes
+    watch(maxDrawCountAllowed, (newMax) => {
+      if (drawCount.value > newMax) {
+        drawCount.value = Math.max(1, newMax);
+      }
+    }, { immediate: true });
+
+    const setDrawCount = (count) => {
+      const maxAllowed = maxDrawCountAllowed.value;
+      if (count > maxAllowed) {
+        showToast(`Cannot select ${count} winners: [${currentAward.value.title}] only allows up to ${maxAllowed} winner${maxAllowed > 1 ? 's' : ''} (Quota: ${currentAward.value.quota})`, 'warning');
+        drawCount.value = maxAllowed;
+        return;
+      }
+      drawCount.value = Math.max(1, count);
+    };
+
+    const clampDrawCount = () => {
+      const maxAllowed = maxDrawCountAllowed.value;
+      if (!drawCount.value || drawCount.value < 1) {
+        drawCount.value = 1;
+      } else if (drawCount.value > maxAllowed) {
+        showToast(`Draw count clamped to [${currentAward.value.title}] maximum allowed: ${maxAllowed}`, 'warning');
+        drawCount.value = maxAllowed;
+      }
+    };
+
+    const setDrawCountToRemainingQuota = () => {
+      const rem = remainingAwardQuota.value;
+      if (rem <= 0) {
+        showToast(`[${currentAward.value.title}] quota is already full (${currentAward.value.quota}/${currentAward.value.quota}).`, 'info');
+        drawCount.value = 1;
+        return;
+      }
+      const maxAllowed = Math.min(rem, Math.max(1, candidatePool.value.length));
+      drawCount.value = maxAllowed;
+      showToast(`Draw count set to remaining quota: ${maxAllowed} winner${maxAllowed > 1 ? 's' : ''}`, 'info');
+    };
+
+    const toggleWinnerKeep = (idx) => {
+      if (fireworkWinners.value[idx]) {
+        fireworkWinners.value[idx].keepInPool = !fireworkWinners.value[idx].keepInPool;
+        const w = fireworkWinners.value[idx];
+        if (w.keepInPool) {
+          showToast(`Will preserve [${w.name}] in candidate pool`, 'info');
+        } else {
+          showToast(`Will remove [${w.name}] from candidate pool`, 'info');
+        }
+      }
+    };
+
+    // ================= WINNERS HISTORY DRAWER =================
+    const isWinnersDrawerOpen = ref(false);
+
+    const openWinnersDrawer = () => {
+      isWinnersDrawerOpen.value = true;
+    };
+
+    const closeWinnersDrawer = () => {
+      isWinnersDrawerOpen.value = false;
+    };
+
+    // Excel Export for Winners
+    const exportWinnersToExcel = () => {
+      if (winnersHistory.value.length === 0) {
+        showToast('No winners recorded yet to export.', 'warning');
+        return;
+      }
+
+      if (!window.XLSX) {
+        showToast('Excel engine is still initializing, please try again.', 'warning');
+        return;
+      }
+
+      try {
+        const exportData = winnersHistory.value.map((w, idx) => ({
+          'No': winnersHistory.value.length - idx,
+          'Prize Tier': w.awardTitle,
+          'Prize Name': w.prizeName,
+          'Winner Name': w.name,
+          'Department': w.department,
+          'Attendee ID': w.id,
+          'Pass Serial': w.ticketSerial,
+          'Draw Time': w.timestamp,
+          'Pool Status': w.removedFromPool ? 'Removed from Pool' : 'Kept in Pool'
+        }));
+
+        const worksheet = window.XLSX.utils.json_to_sheet(exportData);
+        const workbook = window.XLSX.utils.book_new();
+        window.XLSX.utils.book_append_sheet(workbook, worksheet, 'Winners');
+
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+        window.XLSX.writeFile(workbook, `Gala_Lucky_Draw_Winners_${dateStr}.xlsx`);
+        showToast('Official winners roster exported to Excel successfully!', 'success');
+      } catch (err) {
+        console.error('Export Excel Error:', err);
+        showToast('Failed to export Excel file. Please try again.', 'warning');
+      }
+    };
+
+    const copyWinnersText = () => {
+      if (winnersHistory.value.length === 0) {
+        showToast('No winners recorded yet to copy.', 'warning');
+        return;
+      }
+
+      const lines = winnersHistory.value.map((w, idx) => {
+        return `${winnersHistory.value.length - idx}. [${w.awardTitle} - ${w.prizeName}] ${w.name} (${w.department} · ${w.ticketSerial}) - ${w.timestamp}`;
+      });
+
+      const fullText = `=== ANNUAL GALA 2026 OFFICIAL WINNERS ROSTER ===\n` + lines.join('\n');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(fullText).then(() => {
+          showToast('Winners list copied to clipboard successfully!', 'success');
+        }).catch(() => {
+          showToast('Clipboard access denied, please select and copy manually.', 'warning');
+        });
+      } else {
+        showToast('Clipboard not supported in this browser.', 'warning');
+      }
+    };
+
+    const clearWinnersHistory = () => {
+      if (winnersHistory.value.length === 0) return;
+      if (confirm('Are you sure you want to clear all official winners records? This action cannot be undone.')) {
+        winnersHistory.value = [];
+        showToast('All winners records have been cleared.', 'info');
+      }
+    };
+
+    const returnWinnerToPool = (wIdx) => {
+      const winner = winnersHistory.value[wIdx];
+      if (!winner) return;
+
+      if (winner.removedFromPool) {
+        const exists = candidatePool.value.some(c => c.name === winner.name && c.id === winner.id);
+        if (!exists) {
+          candidatePool.value.unshift({
+            id: winner.id,
+            name: winner.name,
+            department: winner.department,
+            avatar: winner.avatar || ''
+          });
+          bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
+        }
+      }
+
+      winnersHistory.value.splice(wIdx, 1);
+      showToast(`Revoked win for [${winner.name}] and returned to candidate pool!`, 'success');
+    };
 
     let audio = null;
-    let particleEngine = null;
     let fireworkEngine = null;
+    let confettiEngine = null;
 
     const remainingCount = computed(() => candidatePool.value.length);
 
-    const syncAllModesRoster = () => {
-      reelTrackItems.value = [...candidatePool.value];
-      wheelCandidates.value = [...candidatePool.value];
-      fireworkCandidates.value = [...candidatePool.value];
-    };
-
-    // ================= ROSTER & PHOTO MANAGER STATE =================
+    // ================= ROSTER & EXCEL IMPORT MANAGER STATE =================
     const isRosterOpen = ref(false);
     const bulkNamesText = ref(DEFAULT_EMPLOYEES.map(e => e.name).join('\n'));
     const activeUploadIndex = ref(-1);
@@ -1682,7 +1518,6 @@ const app = createApp({
       isRosterOpen.value = false;
     };
 
-    // Sync from bulk textarea (like Wheel of Names)
     const syncBulkNames = () => {
       const lines = bulkNamesText.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length === 0) return;
@@ -1699,12 +1534,11 @@ const app = createApp({
       });
 
       candidatePool.value = newPool;
-      syncAllModesRoster();
+      showToast(`Candidate roster updated. Total: ${newPool.length} attendees.`, 'info');
     };
 
     const syncFromCards = () => {
       bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
-      syncAllModesRoster();
     };
 
     const shuffleRoster = () => {
@@ -1715,31 +1549,119 @@ const app = createApp({
       }
       candidatePool.value = arr;
       bulkNamesText.value = arr.map(e => e.name).join('\n');
-      syncAllModesRoster();
+      showToast('Candidate roster shuffled randomly!', 'success');
     };
 
     const sortRoster = () => {
       const arr = [...candidatePool.value];
-      arr.sort((a, b) => a.name.localeCompare(b.name));
+      arr.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
       candidatePool.value = arr;
       bulkNamesText.value = arr.map(e => e.name).join('\n');
-      syncAllModesRoster();
+      showToast('Candidate roster sorted alphabetically (A-Z)!', 'info');
     };
 
     const removeCandidateAt = (idx) => {
-      if (candidatePool.value.length <= 2) {
-        alert('Please maintain at least 2 candidates in the pool.');
+      if (candidatePool.value.length <= 1) {
+        showToast('Please maintain at least 1 candidate in the pool.', 'warning');
         return;
       }
-      candidatePool.value.splice(idx, 1);
+      const removed = candidatePool.value.splice(idx, 1);
       bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
-      syncAllModesRoster();
+      if (removed.length > 0) {
+        showToast(`Removed: ${removed[0].name}`, 'info');
+      }
     };
 
-    const restoreDefaultRoster = () => {
-      candidatePool.value = JSON.parse(JSON.stringify(DEFAULT_EMPLOYEES));
-      bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
-      syncAllModesRoster();
+    const clearRoster = () => {
+      if (confirm('Are you sure you want to clear the candidate roster? You can import an Excel or CSV file afterwards.')) {
+        candidatePool.value = [];
+        bulkNamesText.value = '';
+        showToast('Candidate roster cleared. Please click [Import Excel / CSV] to load attendees.', 'info');
+      }
+    };
+
+    // Excel / CSV File Import via Local SheetJS
+    const triggerExcelImport = () => {
+      const fileInput = document.getElementById('excel-file-input');
+      if (fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+      }
+    };
+
+    const onExcelSelected = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (!window.XLSX) {
+        showToast('Excel tool is not ready. Please refresh the page and try again.', 'warning');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = window.XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const rawRows = window.XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+          if (!rawRows || rawRows.length === 0) {
+            showToast('No readable rows found in the selected Excel file.', 'warning');
+            return;
+          }
+
+          // Smart Column Detection
+          const firstRowStr = (rawRows[0] || []).map(cell => String(cell || '').trim().toLowerCase());
+          const hasHeaderKeywords = firstRowStr.some(s => /name|attendee|member|person|姓名|名字/i.test(s));
+
+          let startIndex = 0;
+          let nameCol = 0;
+          let deptCol = -1;
+          let idCol = -1;
+
+          if (hasHeaderKeywords) {
+            startIndex = 1;
+            firstRowStr.forEach((col, idx) => {
+              if (/name|attendee|member|person|姓名|名字/i.test(col)) nameCol = idx;
+              else if (/dept|department|team|division|sector|部门/i.test(col)) deptCol = idx;
+              else if (/id|code|ticket|serial|工号|编号/i.test(col)) idCol = idx;
+            });
+          }
+
+          const importedList = [];
+          for (let r = startIndex; r < rawRows.length; r++) {
+            const row = rawRows[r];
+            if (!row || row.length === 0) continue;
+            const nameVal = row[nameCol] !== undefined ? String(row[nameCol]).trim() : '';
+            if (!nameVal) continue;
+
+            const deptVal = deptCol >= 0 && row[deptCol] !== undefined ? String(row[deptCol]).trim() : 'Corporate Talent';
+            const idVal = idCol >= 0 && row[idCol] !== undefined ? String(row[idCol]).trim() : `EMP-${1000 + importedList.length + 1}`;
+
+            importedList.push({
+              id: idVal,
+              name: nameVal,
+              department: deptVal,
+              avatar: ''
+            });
+          }
+
+          if (importedList.length === 0) {
+            showToast('Could not extract valid names from the file. Please check column headers.', 'warning');
+            return;
+          }
+
+          candidatePool.value = importedList;
+          bulkNamesText.value = importedList.map(e => e.name).join('\n');
+          showToast(`🎉 Successfully imported ${importedList.length} candidates from Excel!`, 'success');
+        } catch (err) {
+          console.error('Excel Import Error:', err);
+          showToast('Failed to parse Excel file. Please verify file format (.xlsx, .xls, .csv).', 'warning');
+        }
+      };
+      reader.readAsArrayBuffer(file);
     };
 
     const triggerPhotoUploadForIndex = (idx) => {
@@ -1760,576 +1682,29 @@ const app = createApp({
         } else if (candidatePool.value.length > 0) {
           candidatePool.value[0].avatar = dataUrl;
         }
-        syncAllModesRoster();
         e.target.value = '';
+        showToast('Custom photo uploaded successfully!', 'success');
       };
       reader.readAsDataURL(file);
     };
 
     const getInitials = (name) => {
-      if (!name) return 'AW';
-      const parts = name.trim().split(' ');
+      if (!name) return 'VIP';
+      const clean = name.trim();
+      if (/^[\u4e00-\u9fa5]+$/.test(clean)) {
+        return clean.length >= 2 ? clean.slice(-2) : clean;
+      }
+      const parts = clean.split(' ');
       if (parts.length >= 2) {
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
       }
-      return parts[0].slice(0, 2).toUpperCase();
+      return clean.slice(0, 2).toUpperCase();
     };
 
-    const switchMode = (mode) => {
-      currentMode.value = mode;
-      resetCurrentMode();
-      if (mode === 'firework') {
-        Vue.nextTick(() => {
-          if (fireworkEngine) {
-            fireworkEngine.ensureCanvas();
-          }
-        });
-      }
-    };
-
-    // =================================================================
-    // MODE 1: FOIL PACK STATE & LOGIC
-    // =================================================================
-    const state = ref('IDLE');
-    const isTorn = ref(false);
-    const isShaking = ref(false);
-    const isFlipped = ref(false);
-    const cardPosition = ref('card-in-pack');
-    const isCutting = ref(false);
-    const cutProgress = ref(0);
-    const sliceTrack = ref(null);
-    const currentWinner = ref(null);
-
-    const winnerInitials = computed(() => getInitials(currentWinner.value ? currentWinner.value.name : ''));
-    const stateClass = computed(() => `state-${state.value.toLowerCase()}`);
-    const cardPositionClass = computed(() => cardPosition.value);
-
-    let dragStartX = 0;
-    let dragStartTime = 0;
-    let hasCompletedTear = false;
-    let cutAnimId = null;
-    let springAnimId = null;
-
-    // Dynamic peel & tilt of the cap based on cutProgress (like authentic peeling foil packaging)
-    const capDynamicStyle = computed(() => {
-      if (isTorn.value) return {};
-      const p = cutProgress.value;
-      if (p <= 0) return {};
-      const liftY = -Math.min(18, (p / 100) * 16);
-      const rot = -Math.min(8.5, (p / 100) * 7.8);
-      return {
-        transform: `translateY(${liftY}px) rotate(${rot}deg)`,
-        transition: isCutting.value ? 'none' : 'transform 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28)'
-      };
-    });
-
-    // Spring back smoothly to 0% (类似游戏那样可以撕回去、松手自然弹回复原)
-    const springBackToZero = () => {
-      if (springAnimId) cancelAnimationFrame(springAnimId);
-      const startP = cutProgress.value;
-      if (startP <= 0) return;
-
-      const duration = Math.max(160, (startP / 100) * 280);
-      const startTime = performance.now();
-
-      const step = (now) => {
-        const elapsed = now - startTime;
-        const rawT = Math.min(1, elapsed / duration);
-        const easeOut = 1 - Math.pow(1 - rawT, 3);
-        const currentP = startP * (1 - easeOut);
-        cutProgress.value = Math.max(0, currentP);
-
-        if (rawT < 1) {
-          springAnimId = requestAnimationFrame(step);
-        } else {
-          cutProgress.value = 0;
-          springAnimId = null;
-        }
-      };
-
-      springAnimId = requestAnimationFrame(step);
-    };
-
-    // Natural physics-based rip animation (duration ~880ms with authentic tearing resistance curve)
-    const animateCutToCompletion = (fromProgress = null) => {
-      if (hasCompletedTear) return;
-      hasCompletedTear = true;
-      isCutting.value = true;
-      audio.initOnFirstGesture();
-
-      if (cutAnimId) cancelAnimationFrame(cutAnimId);
-      if (springAnimId) cancelAnimationFrame(springAnimId);
-
-      const startP = fromProgress !== null ? fromProgress : cutProgress.value;
-      const targetP = 100;
-      const remainingDist = Math.max(15, targetP - startP);
-      
-      // Full rip: 880ms. Partial drag completion scales proportionally (min 400ms for visual delight)
-      const duration = Math.max(400, (remainingDist / 100) * 880);
-      const startTime = performance.now();
-      let lastAudioTick = 0;
-
-      const step = (now) => {
-        const elapsed = now - startTime;
-        const rawT = Math.min(1, elapsed / duration);
-
-        // Natural tactile tearing curve: initial resistance (0-25%), accelerating zip (25-85%), crisp detachment (85-100%)
-        let easeT;
-        if (rawT < 0.28) {
-          // Initial cut penetration: slightly slower
-          easeT = (rawT / 0.28) * 0.18;
-        } else if (rawT < 0.82) {
-          // Steady ripping glide across pack
-          const midT = (rawT - 0.28) / (0.82 - 0.28);
-          easeT = 0.18 + midT * 0.68;
-        } else {
-          // Final swift snap through outer edge
-          const endT = (rawT - 0.82) / (1 - 0.82);
-          easeT = 0.86 + Math.pow(endT, 1.4) * 0.14;
-        }
-
-        const currentP = startP + (targetP - startP) * easeT;
-        cutProgress.value = Math.min(100, currentP);
-
-        // Modulate continuous physical foil tearing audio
-        if (now - lastAudioTick > 55) {
-          lastAudioTick = now;
-          audio.playSliceScratchSound(currentP / 100);
-        }
-
-        // Emit sparks along the laser blade head
-        if (sliceTrack.value) {
-          const rect = sliceTrack.value.getBoundingClientRect();
-          const sparkX = rect.left + (rect.width * Math.min(100, currentP)) / 100;
-          const sparkY = rect.top + rect.height / 2;
-          particleEngine.emitSparks(sparkX, sparkY);
-        }
-
-        if (rawT < 1) {
-          cutAnimId = requestAnimationFrame(step);
-        } else {
-          cutAnimId = null;
-          completeCut();
-        }
-      };
-
-      cutAnimId = requestAnimationFrame(step);
-    };
-
-    const startCut = (e) => {
-      if (state.value !== 'IDLE' || isTorn.value || hasCompletedTear) return;
-      if (springAnimId) {
-        cancelAnimationFrame(springAnimId);
-        springAnimId = null;
-      }
-      isCutting.value = true;
-      dragStartX = e.clientX;
-      dragStartTime = Date.now();
-      audio.initOnFirstGesture();
-
-      if (e.currentTarget && e.currentTarget.setPointerCapture && e.pointerId !== undefined) {
-        try {
-          e.currentTarget.setPointerCapture(e.pointerId);
-        } catch (err) {}
-      }
-      updateCutPosition(e.clientX, e.clientY);
-    };
-
-    const onCutMove = (e) => {
-      if (!isCutting.value || state.value !== 'IDLE' || hasCompletedTear) return;
-      updateCutPosition(e.clientX, e.clientY);
-    };
-
-    const updateCutPosition = (clientX, clientY) => {
-      if (!sliceTrack.value || hasCompletedTear) return;
-      const rect = sliceTrack.value.getBoundingClientRect();
-      const relativeX = clientX - rect.left;
-      
-      // BIDIRECTIONAL: can tear forward (> 0) and tear backward (< current)
-      const rawProgress = Math.max(0, Math.min(100, (relativeX / rect.width) * 100));
-      const delta = rawProgress - cutProgress.value;
-      cutProgress.value = rawProgress;
-
-      if (Math.abs(delta) > 2.0) {
-        audio.playSliceScratchSound(rawProgress / 100);
-        if (delta > 0) {
-          particleEngine.emitSparks(clientX, clientY);
-        }
-      }
-
-      // If user manually drags all the way across (>= 90%), snap complete!
-      if (cutProgress.value >= 90) {
-        animateCutToCompletion(cutProgress.value);
-      }
-    };
-
-    const onTrackClick = (e) => {
-      if (state.value !== 'IDLE' || isTorn.value || hasCompletedTear) return;
-      // Single click triggers graceful 880ms rip
-      animateCutToCompletion(0);
-    };
-
-    const endCut = (e) => {
-      if (!isCutting.value) return;
-      isCutting.value = false;
-      if (state.value !== 'IDLE' || hasCompletedTear) return;
-
-      const elapsed = Date.now() - dragStartTime;
-      const dist = e ? Math.abs(e.clientX - dragStartX) : 0;
-
-      // Quick tap or click without drag (< 220ms): auto-rip across over 880ms
-      if (elapsed < 220 && dist < 12) {
-        animateCutToCompletion(0);
-      } else if (cutProgress.value >= 82) {
-        // Almost finished: snap finish the rest
-        animateCutToCompletion(cutProgress.value);
-      } else {
-        // Let go mid-way: SPRING BACK TO 0! (像游戏那样可以撕回去)
-        springBackToZero();
-      }
-    };
-
-    const completeCut = () => {
-      if (state.value !== 'IDLE') return;
-      isCutting.value = false;
-      cutProgress.value = 100;
-
-      if (candidatePool.value.length === 0) {
-        alert('All candidates drawn! Resetting roster.');
-        resetCurrentMode();
-        return;
-      }
-
-      const randIdx = Math.floor(Math.random() * candidatePool.value.length);
-      currentWinner.value = candidatePool.value.splice(randIdx, 1)[0];
-      syncAllModesRoster();
-      bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
-
-      state.value = 'TEARING';
-      isShaking.value = true;
-      isTorn.value = true;
-      audio.playSliceCompleteSound();
-
-      setTimeout(() => {
-        isShaking.value = false;
-        state.value = 'SLIDING';
-        cardPosition.value = 'card-sliding';
-        audio.playSlideSound();
-
-        setTimeout(() => {
-          state.value = 'FLIPPING';
-          cardPosition.value = 'card-revealed-pos';
-          isFlipped.value = true;
-          audio.playFlipSound();
-
-          setTimeout(() => {
-            state.value = 'REVEALED';
-            audio.playFanfare();
-            particleEngine.burstConfetti();
-          }, 750);
-
-        }, 600);
-
-      }, 400);
-    };
-
-    const autoCutWithSpace = () => {
-      if (state.value !== 'IDLE' || isTorn.value || hasCompletedTear) return;
-      audio.initOnFirstGesture();
-      cutProgress.value = 0;
-      animateCutToCompletion(0);
-    };
-
-    const nextDraw = () => {
-      if (state.value !== 'REVEALED') return;
-      hasCompletedTear = false;
-      if (cutAnimId) {
-        cancelAnimationFrame(cutAnimId);
-        cutAnimId = null;
-      }
-      if (springAnimId) {
-        cancelAnimationFrame(springAnimId);
-        springAnimId = null;
-      }
-      state.value = 'IDLE';
-      isTorn.value = false;
-      isShaking.value = false;
-      isFlipped.value = false;
-      cardPosition.value = 'card-in-pack';
-      currentWinner.value = null;
-      cutProgress.value = 0;
-      isCutting.value = false;
-    };
-
-    // =================================================================
-    // MODE 2: GALA SLOT REEL (NATURAL PHYSICAL DECELERATION)
-    // =================================================================
-    // States: 'IDLE' | 'SPINNING' | 'DECELERATING' | 'LOCKED' | 'REVEALED'
-    const reelState = ref('IDLE');
-    const currentScrollY = ref(0);
-    const displayVelocity = ref(0);
-    const targetWinnerIndex = ref(-1);
-    const reelWinner = ref(null);
-    const ROW_HEIGHT = 110; // Exactly 110px per row
-    let reelAnimId = null;
-
-    const isReelSpinning = computed(() => {
-      return reelState.value === 'SPINNING' || reelState.value === 'DECELERATING';
-    });
-
-    const physicsPhaseDescription = computed(() => {
-      switch (reelState.value) {
-        case 'IDLE': return 'READY';
-        case 'SPINNING': return 'SPINNING';
-        case 'DECELERATING': return 'DECELERATING';
-        case 'LOCKED': return 'WINNER LOCKED';
-        case 'REVEALED': return 'WINNER CONFIRMED';
-        default: return 'READY';
-      }
-    });
-
-    // START NATURAL GALA SLOT REEL SPIN
-    const startReelSpin = () => {
-      if (reelState.value !== 'IDLE' && reelState.value !== 'REVEALED') return;
-      if (candidatePool.value.length === 0) {
-        alert('All candidates drawn! Resetting demo roster.');
-        resetCurrentMode();
-        return;
-      }
-
-      audio.initOnFirstGesture();
-
-      // Reset scroll position immediately for clean fresh spin
-      currentScrollY.value = 0;
-
-      // 1. Pick REAL Winner from candidatePool
-      const realIdx = Math.floor(Math.random() * candidatePool.value.length);
-      const winner = candidatePool.value.splice(realIdx, 1)[0];
-      reelWinner.value = winner;
-      syncAllModesRoster();
-      bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
-
-      // 2. Assemble a track of candidate rows using dynamic pool (winner centered at targetIdx)
-      const pool = candidatePool.value.length > 0 ? candidatePool.value : DEFAULT_EMPLOYEES;
-      const targetIdx = 36 + Math.floor(Math.random() * 8);
-      targetWinnerIndex.value = targetIdx;
-
-      const track = [];
-      for (let i = 0; i < targetIdx; i++) {
-        track.push({ ...pool[i % pool.length] });
-      }
-      track.push({ ...winner }); // Winner at targetIdx
-      for (let j = 1; j <= 8; j++) {
-        track.push({ ...pool[(targetIdx + j) % pool.length] });
-      }
-
-      reelTrackItems.value = track;
-
-      // Final target scroll distance: exactly centers the winner row
-      const y_final = (targetIdx - 1) * ROW_HEIGHT; // 2750px
-      const totalDuration = 6500; // 6.5s natural smooth decay
-      const power = 3.4;
-      const startTime = performance.now();
-      let lastClickedRow = -1;
-
-      reelState.value = 'SPINNING';
-      if (reelAnimId) cancelAnimationFrame(reelAnimId);
-
-      const animStep = (now) => {
-        const elapsed = now - startTime;
-
-        if (elapsed >= totalDuration) {
-          // Clean, decisive arrival directly on the winner
-          currentScrollY.value = y_final;
-          displayVelocity.value = 0;
-          reelState.value = 'LOCKED';
-
-          audio.playLatchSnap();
-
-          // 0.4s Dramatic Tension Pause -> Explode Celebration!
-          setTimeout(() => {
-            reelState.value = 'REVEALED';
-            audio.playFanfare();
-            particleEngine.burstConfetti();
-          }, 400);
-
-          return;
-        }
-
-        // Pure smooth physical power ease-out (velocity strictly decays to 0)
-        const s = elapsed / totalDuration;
-        const y = y_final * (1 - Math.pow(1 - s, power));
-        const v = (y_final * power / (totalDuration / 1000)) * Math.pow(1 - s, power - 1);
-
-        if (s < 0.55) {
-          reelState.value = 'SPINNING';
-        } else {
-          reelState.value = 'DECELERATING';
-        }
-
-        // Tick sound synchronization: play tick on each 110px row boundary
-        const currentRow = Math.floor(y / ROW_HEIGHT);
-        if (currentRow !== lastClickedRow) {
-          lastClickedRow = currentRow;
-          audio.playReelClick(v);
-        }
-
-        currentScrollY.value = y;
-        displayVelocity.value = Math.max(0, v);
-
-        reelAnimId = requestAnimationFrame(animStep);
-      };
-
-      reelAnimId = requestAnimationFrame(animStep);
-    };
-
-    // =================================================================
-    // =================================================================
-    // MODE 3: BESPOKE GALA FORTUNE WHEEL (IMPERIAL GOLD & NAVY PALETTE)
-    // =================================================================
-    // States: 'IDLE' | 'SPINNING' | 'DECELERATING' | 'LOCKED' | 'REVEALED'
-    const wheelState = ref('IDLE');
-    const wheelRotation = ref(0);
-    const pointerFlutterAngle = ref(0);
-    const wheelWinner = ref(null);
-    const currentIndicatorCandidate = ref(null);
-    let wheelAnimId = null;
-
-    const sectorCount = computed(() => wheelCandidates.value.length || 1);
-    const sectorAngle = computed(() => 360 / sectorCount.value);
-
-    // Bespoke Imperial Gold & Deep Navy luxury gala palette
-    const sectorColors = [
-      '#0f172a', '#d4af37', '#1e293b', '#b45309',
-      '#1e1b4b', '#f59e0b', '#172554', '#ca8a04',
-      '#022c22', '#d97706', '#1e293b', '#eab308'
-    ];
-
-    const getSectorColor = (idx) => sectorColors[idx % sectorColors.length];
-
-    const isWheelSpinning = computed(() => {
-      return wheelState.value === 'SPINNING' || wheelState.value === 'DECELERATING';
-    });
-
-    // PURE PHYSICAL ROTATION (Wheel of Names Model)
-    const startWheelSpin = () => {
-      if (wheelState.value === 'SPINNING' || wheelState.value === 'DECELERATING' || wheelState.value === 'LOCKED') return;
-      if (wheelCandidates.value.length === 0) {
-        alert('All candidates drawn! Resetting demo roster.');
-        wheelCandidates.value = [...DEFAULT_EMPLOYEES];
-        return;
-      }
-
-      audio.initOnFirstGesture();
-
-      // Pick winner index
-      const numSectors = wheelCandidates.value.length;
-      const anglePerSec = 360 / numSectors;
-      const targetSectorIdx = Math.floor(Math.random() * numSectors);
-      const winner = wheelCandidates.value[targetSectorIdx];
-      wheelWinner.value = winner;
-
-      // Pure continuous landing position across the sector (0.005 to 0.995)
-      // Produces natural millimeter-level boundary suspense whenever Math.random() is near 0 or 1
-      const sectorPositionRatio = 0.008 + Math.random() * 0.984;
-      const targetAngle = (targetSectorIdx + sectorPositionRatio) * anglePerSec;
-
-      // Pointer is at 3 o'clock (0 deg / 360 deg)
-      const desiredMod360 = (360 - (targetAngle % 360)) % 360;
-
-      const startAngle = wheelRotation.value;
-      const currentMod360 = (startAngle % 360 + 360) % 360;
-      let forwardDelta = desiredMod360 - currentMod360;
-      if (forwardDelta <= 0) forwardDelta += 360;
-
-      // 7 to 9 full spins for a long, thrilling blur
-      const numFullSpins = 7 + Math.floor(Math.random() * 3);
-      const totalDeltaRotation = 360 * numFullSpins + forwardDelta;
-      const finalWheelRotation = startAngle + totalDeltaRotation;
-
-      // Duration: 7.5s to 8.4s with smooth cubic/quartic ease-out tail
-      const totalDuration = 7600 + Math.random() * 800;
-      const power = 3.9; // Authentic heavy-wheel friction: fast start, long creeping tail
-      const startTime = performance.now();
-      let lastSectorIdx = -1;
-
-      wheelState.value = 'SPINNING';
-      if (wheelAnimId) cancelAnimationFrame(wheelAnimId);
-
-      const wheelStep = (now) => {
-        const elapsed = now - startTime;
-
-        if (elapsed >= totalDuration) {
-          wheelRotation.value = finalWheelRotation;
-          pointerFlutterAngle.value = 0;
-          wheelState.value = 'LOCKED';
-          audio.playPegSnap();
-
-          setTimeout(() => {
-            wheelState.value = 'REVEALED';
-            audio.playFanfare();
-            particleEngine.burstConfetti();
-          }, 350);
-
-          return;
-        }
-
-        const s = Math.min(1, elapsed / totalDuration);
-        const currentRot = startAngle + totalDeltaRotation * (1 - Math.pow(1 - s, power));
-        const rotSpeed = (totalDeltaRotation * power / (totalDuration / 1000)) * Math.pow(1 - s, power - 1);
-        wheelRotation.value = currentRot;
-
-        if (s < 0.60) {
-          wheelState.value = 'SPINNING';
-        } else {
-          wheelState.value = 'DECELERATING';
-        }
-
-        // Pointer at 3 o'clock (0 deg): track current sector and trigger micro-flutter & clicks
-        const angleAt3OClock = (360 - (currentRot % 360)) % 360;
-        const currentSectorIdx = Math.floor(angleAt3OClock / anglePerSec);
-        const safeIdx = (currentSectorIdx + numSectors) % numSectors;
-        currentIndicatorCandidate.value = wheelCandidates.value[safeIdx];
-
-        // Sector boundary crossing detection
-        if (currentSectorIdx !== lastSectorIdx) {
-          lastSectorIdx = currentSectorIdx;
-          audio.playNeedleTick(rotSpeed);
-          // Micro-flutter on 3 o'clock pointer
-          pointerFlutterAngle.value = (rotSpeed > 80) ? (Math.random() > 0.5 ? 2.5 : -2.5) : -3.5;
-        }
-
-        // Pointer spring back to 0
-        pointerFlutterAngle.value *= 0.78;
-
-        wheelAnimId = requestAnimationFrame(wheelStep);
-      };
-
-      wheelAnimId = requestAnimationFrame(wheelStep);
-    };
-
-    // Remove Winner from Wheel (dynamic sector resizing)
-    const removeWinnerFromWheel = () => {
-      if (!wheelWinner.value) return;
-      const poolIdx = candidatePool.value.findIndex(c => c.id === wheelWinner.value.id);
-      if (poolIdx !== -1) {
-        candidatePool.value.splice(poolIdx, 1);
-      }
-      syncAllModesRoster();
-      bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
-      wheelState.value = 'IDLE';
-      wheelWinner.value = null;
-    };
-
-    const closeWheelModal = () => {
-      wheelState.value = 'IDLE';
-    };
-
-    // =================================================================
-    // MODE 4: CELESTIAL FIREWORK BURST (MALAYSIAN GALA EDITION)
-    // =================================================================
+    // ================= CELESTIAL FIREWORK STATE & LOGIC =================
     const fireworkState = ref('IDLE'); // 'IDLE' | 'IGNITING' | 'ASCENDING' | 'APEX' | 'BURSTING' | 'REVEALED'
-    const fireworkWinner = ref(null);
+    const fireworkWinners = ref([]);
+    const fireworkWinner = computed(() => fireworkWinners.value[0] || null);
 
     const isFireworkActive = computed(() => {
       return fireworkState.value === 'IGNITING' || fireworkState.value === 'ASCENDING' || fireworkState.value === 'APEX' || fireworkState.value === 'BURSTING';
@@ -2342,52 +1717,62 @@ const app = createApp({
         fireworkEngine.ensureCanvas();
       }
 
-      // If already revealed, smoothly reset to ground battery before launching next shell
       if (fireworkState.value === 'REVEALED') {
-        fireworkState.value = 'IDLE';
-        if (fireworkEngine) fireworkEngine.clear();
-        setTimeout(() => {
-          startFireworkLaunch();
-        }, 320);
+        confirmAndDrawNext();
         return;
       }
 
-      if (fireworkCandidates.value.length === 0) {
-        alert('All candidates drawn! Restoring demo roster.');
-        fireworkCandidates.value = [...candidatePool.value];
+      if (candidatePool.value.length === 0) {
+        showToast('The candidate pool is empty! Please import an Excel file or add names.', 'warning');
         return;
       }
+
+      // Check quota status and strictly enforce tier limits
+      const remQuota = remainingAwardQuota.value;
+      if (remQuota <= 0) {
+        showToast(`Cannot launch: [${currentAward.value.title}] quota is already full (${currentAward.value.quota}/${currentAward.value.quota}). Please select another prize tier.`, 'warning');
+        return;
+      }
+
+      // Determine batch count (strictly clamped to tier remaining quota)
+      let count = Math.max(1, Math.min(drawCount.value, remQuota, candidatePool.value.length));
+      if (drawCount.value > remQuota) {
+        drawCount.value = count;
+        showToast(`Draw count clamped to [${currentAward.value.title}] remaining quota (${count} slots)`, 'warning');
+      }
+
+      // Pick distinct random winners
+      const poolCopy = [...candidatePool.value];
+      const picked = [];
+      for (let i = 0; i < count; i++) {
+        const randIdx = Math.floor(Math.random() * poolCopy.length);
+        const item = poolCopy.splice(randIdx, 1)[0];
+        picked.push({ ...item, keepInPool: false });
+      }
+      fireworkWinners.value = picked;
 
       if (audio) audio.initOnFirstGesture();
 
-      // Pick winner
-      const winnerIdx = Math.floor(Math.random() * fireworkCandidates.value.length);
-      const winner = fireworkCandidates.value[winnerIdx];
-      fireworkWinner.value = winner;
-
-      // Phase 1: Quickmatch Fuse Sizzle (0.4s)
+      // Phase 1: Fast Quickmatch Fuse Sizzle (0.15s)
       fireworkState.value = 'IGNITING';
-      if (audio) audio.playFuseIgnite(0.4);
+      if (audio) audio.playFuseIgnite(0.18);
 
       setTimeout(() => {
-        // Phase 2: High-Velocity Mortar Lift & Rocket Ascent (1.3s)
+        // Phase 2: High-Velocity Mortar Lift & Soaring Rocket Ascent (2.60s soaring climb)
         fireworkState.value = 'ASCENDING';
-        const durationMs = 1300;
+        const durationMs = 2600;
 
-        // Exact physical coordinates from the ceremonial mortar tube mouth
         const rim = document.getElementById('mortar-launch-rim');
-        let startX = window.innerWidth / 2;
+        const startX = window.innerWidth / 2;
         let startY = window.innerHeight - 110;
         if (rim) {
           const r = rim.getBoundingClientRect();
-          startX = r.left + r.width / 2;
           startY = r.top + 4;
         }
 
         const targetX = window.innerWidth / 2;
         const targetY = window.innerHeight * 0.32;
 
-        // Synchronous audio: explosive bottom lift punch + acoustic screamer ascent
         if (audio) {
           audio.playMortarLift();
           audio.playRocketAscent(durationMs / 1000);
@@ -2401,100 +1786,179 @@ const app = createApp({
             targetY,
             durationMs,
             (apexX, apexY) => {
-              // Phase 3: Apex Suspense (0.5s Dead Silence)
+              // Phase 3: Apex Suspense (0.15s)
               fireworkState.value = 'APEX';
 
               setTimeout(() => {
-                // Phase 4: Supernova Detonation (Multi-Colored Pyro Blast & 3D Particle Text Morphing)
+                // Phase 4: Supernova Detonation (1.35s bloom to reveal winners)
                 fireworkState.value = 'BURSTING';
                 if (audio) audio.playMortarBlast();
                 if (fireworkEngine) {
+                  // If multi-winner batch, add celebratory background bursts
+                  if (count > 1) {
+                    setTimeout(() => fireworkEngine.spawnBackgroundBurst(), 220);
+                    setTimeout(() => fireworkEngine.spawnBackgroundBurst(), 580);
+                    setTimeout(() => fireworkEngine.spawnBackgroundBurst(), 950);
+                  }
+
                   fireworkEngine.createExplosion(
                     apexX, 
                     apexY, 
-                    winner.name,
+                    picked[0].name,
+                    null,
                     () => {
-                      // On Morph Start (~0.45s into explosion: particles swarm toward letters)
-                      if (audio) audio.playSwarmMorph();
-                    },
-                    () => {
-                      // On 3D Particle Text Locked (~1.35s: letters glowing in night sky)
+                      // On Explosion Blooming (~1.35s: Reveal Winners in night sky)
                       fireworkState.value = 'REVEALED';
                       if (audio) audio.playStarlightChime();
+                      if (confettiEngine) confettiEngine.burst(count > 1 ? 220 : 160);
                     }
                   );
                 }
-              }, 500); // 0.5s suspense stillness at apex
+              }, 150); // 150ms apex suspense pause
             }
           );
         }
-      }, 400); // 0.4s fuse ignition delay
+      }, 150); // 150ms quickmatch fuse ignition delay
+    };
+
+    // ================= WHEEL OF SPIN STYLE ACTIONS (SINGLE & BATCH) =================
+    // 1. Confirm & Remove All Winners from Pool
+    const confirmAndRemoveWinners = () => {
+      if (fireworkWinners.value.length === 0) return;
+      const award = currentAward.value;
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+      fireworkWinners.value.forEach(w => {
+        const shouldRemove = !w.keepInPool;
+        const serial = `TKT-2026-${w.id ? (w.id.replace(/\D/g, '') || '8820') : '8820'}`;
+        winnersHistory.value.unshift({
+          name: w.name,
+          department: w.department || 'Corporate Talent',
+          id: w.id || 'EMP-0000',
+          ticketSerial: serial,
+          avatar: w.avatar || '',
+          awardId: award.id,
+          awardTitle: award.title,
+          prizeName: award.prizeName,
+          timestamp: timeStr,
+          removedFromPool: shouldRemove
+        });
+
+        if (shouldRemove) {
+          const poolIdx = candidatePool.value.findIndex(c => c.id === w.id && c.name === w.name);
+          if (poolIdx !== -1) candidatePool.value.splice(poolIdx, 1);
+        }
+      });
+
+      bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
+      showToast(`Confirmed ${fireworkWinners.value.length} winners and removed from candidate pool.`, 'success');
+
+      fireworkState.value = 'IDLE';
+      fireworkWinners.value = [];
+      if (fireworkEngine) fireworkEngine.clear();
+      if (confettiEngine) confettiEngine.clear();
+    };
+
+    // 2. Keep All Winners in Pool (allow drawing again)
+    const keepWinnersInPool = () => {
+      if (fireworkWinners.value.length === 0) return;
+      const award = currentAward.value;
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+      fireworkWinners.value.forEach(w => {
+        const serial = `TKT-2026-${w.id ? (w.id.replace(/\D/g, '') || '8820') : '8820'}`;
+        winnersHistory.value.unshift({
+          name: w.name,
+          department: w.department || 'Corporate Talent',
+          id: w.id || 'EMP-0000',
+          ticketSerial: serial,
+          avatar: w.avatar || '',
+          awardId: award.id,
+          awardTitle: award.title,
+          prizeName: award.prizeName,
+          timestamp: timeStr,
+          removedFromPool: false
+        });
+      });
+
+      showToast(`Recorded ${fireworkWinners.value.length} winners; preserved in candidate pool.`, 'info');
+
+      fireworkState.value = 'IDLE';
+      fireworkWinners.value = [];
+      if (fireworkEngine) fireworkEngine.clear();
+      if (confettiEngine) confettiEngine.clear();
+    };
+
+    // 3. Confirm, Remove & Immediately Draw Next Batch
+    const confirmAndDrawNext = () => {
+      if (fireworkWinners.value.length === 0) return;
+      const award = currentAward.value;
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+      fireworkWinners.value.forEach(w => {
+        const shouldRemove = !w.keepInPool;
+        const serial = `TKT-2026-${w.id ? (w.id.replace(/\D/g, '') || '8820') : '8820'}`;
+        winnersHistory.value.unshift({
+          name: w.name,
+          department: w.department || 'Corporate Talent',
+          id: w.id || 'EMP-0000',
+          ticketSerial: serial,
+          avatar: w.avatar || '',
+          awardId: award.id,
+          awardTitle: award.title,
+          prizeName: award.prizeName,
+          timestamp: timeStr,
+          removedFromPool: shouldRemove
+        });
+
+        if (shouldRemove) {
+          const poolIdx = candidatePool.value.findIndex(c => c.id === w.id && c.name === w.name);
+          if (poolIdx !== -1) candidatePool.value.splice(poolIdx, 1);
+        }
+      });
+
+      bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
+
+      fireworkState.value = 'IDLE';
+      fireworkWinners.value = [];
+      if (fireworkEngine) fireworkEngine.clear();
+      if (confettiEngine) confettiEngine.clear();
+
+      if (candidatePool.value.length === 0) {
+        showToast('All candidates drawn! Ticket pool is now empty.', 'warning');
+        return;
+      }
+
+      // Check quota status
+      if (isAwardFilled(currentAward.value.id)) {
+        showToast(`[${currentAward.value.title}] quota is now filled!`, 'warning');
+      }
+
+      // Fast next draw trigger
+      setTimeout(() => {
+        startFireworkLaunch();
+      }, 260);
     };
 
     const removeWinnerFromFirework = () => {
-      if (!fireworkWinner.value) return;
-      const poolIdx = candidatePool.value.findIndex(c => c.id === fireworkWinner.value.id);
-      if (poolIdx !== -1) candidatePool.value.splice(poolIdx, 1);
-      syncAllModesRoster();
-      bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
-      fireworkState.value = 'IDLE';
-      fireworkWinner.value = null;
-      if (fireworkEngine) fireworkEngine.clear();
+      confirmAndRemoveWinners();
     };
 
     const closeFireworkModal = () => {
       fireworkState.value = 'IDLE';
+      fireworkWinners.value = [];
       if (fireworkEngine) fireworkEngine.clear();
+      if (confettiEngine) confettiEngine.clear();
     };
 
-    // Reset Current Mode Stage State
-    const resetCurrentMode = (resetPool = false) => {
-      // Pack reset
-      hasCompletedTear = false;
-      if (cutAnimId) {
-        cancelAnimationFrame(cutAnimId);
-        cutAnimId = null;
-      }
-      if (springAnimId) {
-        cancelAnimationFrame(springAnimId);
-        springAnimId = null;
-      }
-      state.value = 'IDLE';
-      isTorn.value = false;
-      isShaking.value = false;
-      isFlipped.value = false;
-      cardPosition.value = 'card-in-pack';
-      currentWinner.value = null;
-      cutProgress.value = 0;
-      isCutting.value = false;
-
-      // Reel reset
-      if (reelAnimId) cancelAnimationFrame(reelAnimId);
-      reelState.value = 'IDLE';
-      currentScrollY.value = 0;
-      displayVelocity.value = 0;
-      reelWinner.value = null;
-      targetWinnerIndex.value = -1;
-      reelTrackItems.value = [...candidatePool.value];
-
-      // Wheel reset
-      if (wheelAnimId) cancelAnimationFrame(wheelAnimId);
-      wheelState.value = 'IDLE';
-      wheelRotation.value = 0;
-      pointerFlutterAngle.value = 0;
-      wheelWinner.value = null;
-      currentIndicatorCandidate.value = null;
-
-      // Firework reset
+    const resetStage = (resetPool = false) => {
       fireworkState.value = 'IDLE';
-      fireworkWinner.value = null;
+      fireworkWinners.value = [];
       if (fireworkEngine) fireworkEngine.clear();
-
-      if (resetPool) {
-        candidatePool.value = [...DEFAULT_EMPLOYEES];
-        syncAllModesRoster();
-        bulkNamesText.value = candidatePool.value.map(e => e.name).join('\n');
-      }
+      if (confettiEngine) confettiEngine.clear();
     };
 
     const toggleMute = () => {
@@ -2504,42 +1968,56 @@ const app = createApp({
       }
     };
 
-    // Spacebar Listener
+    const toggleFullscreen = () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          isFullscreen.value = true;
+        }).catch(err => {
+          console.warn('Fullscreen request:', err);
+        });
+      } else {
+        document.exitFullscreen().then(() => {
+          isFullscreen.value = false;
+        }).catch(err => {});
+      }
+    };
+
+    document.addEventListener('fullscreenchange', () => {
+      isFullscreen.value = !!document.fullscreenElement;
+      if (fireworkEngine) {
+        fireworkEngine.resize();
+      }
+      if (confettiEngine) {
+        confettiEngine.resize();
+      }
+    });
+
+    // Spacebar & Keyboard Shortcuts
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       if (e.code === 'Space') {
         e.preventDefault();
-        if (currentMode.value === 'pack') {
-          if (state.value === 'IDLE') {
-            autoCutWithSpace();
-          } else if (state.value === 'REVEALED') {
-            nextDraw();
-          }
-        } else if (currentMode.value === 'reel') {
-          if (reelState.value === 'IDLE' || reelState.value === 'REVEALED') {
-            startReelSpin();
-          }
-        } else if (currentMode.value === 'wheel') {
-          if (wheelState.value === 'IDLE' || wheelState.value === 'REVEALED') {
-            startWheelSpin();
-          }
-        } else if (currentMode.value === 'firework') {
-          if (fireworkState.value === 'IDLE' || fireworkState.value === 'REVEALED') {
-            startFireworkLaunch();
-          }
+        if (fireworkState.value === 'IDLE') {
+          startFireworkLaunch();
+        } else if (fireworkState.value === 'REVEALED') {
+          confirmAndDrawNext();
         }
       } else if (e.code === 'KeyM') {
         toggleMute();
+      } else if (e.code === 'KeyF') {
+        toggleFullscreen();
       } else if (e.code === 'KeyR') {
-        resetCurrentMode();
+        resetStage(false);
       }
     };
 
     onMounted(() => {
       audio = new ProceduralAudioEngine();
-      particleEngine = new ParticleEngine('confetti-canvas');
-      fireworkEngine = new CelestialFireworkEngine('firework-canvas');
+      window.__galaAudio = audio;
+      fireworkEngine = new CelestialFireworkEngine('firework-canvas', 'firework-trails-canvas');
+      fireworkEngine.startLoop();
+      confettiEngine = new RoyalGoldConfettiEngine('confetti-canvas');
       window.addEventListener('keydown', handleKeyDown);
 
       const unlockAudio = () => {
@@ -2552,75 +2030,67 @@ const app = createApp({
     });
 
     return {
-      currentMode,
       isMuted,
+      isFullscreen,
       remainingCount,
-      currentAward,
       getInitials,
-      switchMode,
       toggleMute,
-      resetCurrentMode,
+      toggleFullscreen,
+      resetStage,
 
-      // Mode 1 (Pack)
-      state,
-      isTorn,
-      isShaking,
-      isFlipped,
-      isCutting,
-      cutProgress,
-      sliceTrack,
-      cardPositionClass,
-      stateClass,
-      currentWinner,
-      winnerInitials,
-      capDynamicStyle,
-      startCut,
-      onCutMove,
-      onTrackClick,
-      endCut,
-      autoCutWithSpace,
-      nextDraw,
-
-      // Mode 2 (Residual Inertia Reel)
-      reelState,
-      physicsPhase: reelState,
-      currentScrollY,
-      displayVelocity,
-      reelTrackItems,
-      targetWinnerIndex,
-      reelWinner,
-      isReelSpinning,
-      physicsPhaseDescription,
-      startReelSpin,
-      startPhysicalSpin: startReelSpin,
-
-      // Mode 3 (Fortune Wheel - Pure Physics)
-      wheelState,
-      wheelRotation,
-      pointerFlutterAngle,
-      wheelWinner,
-      wheelCandidates,
-      sectorCount,
-      sectorAngle,
-      getSectorColor,
-      isWheelSpinning,
-      currentIndicatorCandidate,
-      startWheelSpin,
-      removeWinnerFromWheel,
-      closeWheelModal,
-
-      // Mode 4 (Celestial Firework Burst)
+      // Firework
       fireworkState,
+      fireworkWinners,
       fireworkWinner,
-      fireworkCandidates,
       isFireworkActive,
       startFireworkLaunch,
       removeWinnerFromFirework,
       closeFireworkModal,
 
-      // Roster & Photo Manager
+      // Batch Draw
+      drawCount,
+      remainingAwardQuota,
+      maxDrawCountAllowed,
+      setDrawCount,
+      clampDrawCount,
+      setDrawCountToRemainingQuota,
+      toggleWinnerKeep,
+
+      // Wheel of Spin Choices
+      confirmAndDrawNext,
+      confirmAndRemoveWinners,
+      keepWinnersInPool,
+
+      // Award Tiers & Ticket Customization
+      awards,
+      currentAwardId,
+      currentAward,
+      isAwardFilled,
+      getAwardWinnersCount,
+      isAwardModalOpen,
+      openAwardModal,
+      closeAwardModal,
+      selectAward,
+      addNewAward,
+      removeAward,
+      activeSettingsTab,
+      ticketConfig,
+      resetTicketConfig,
+
+      // Winners History
+      winnersHistory,
+      isWinnersDrawerOpen,
+      openWinnersDrawer,
+      closeWinnersDrawer,
+      exportWinnersToExcel,
+      copyWinnersText,
+      clearWinnersHistory,
+      returnWinnerToPool,
+
+      // Candidate Roster Drawer
       isRosterOpen,
       bulkNamesText,
+      candidatePool,
       openRosterDrawer,
       closeRosterDrawer,
       syncBulkNames,
@@ -2628,9 +2098,16 @@ const app = createApp({
       shuffleRoster,
       sortRoster,
       removeCandidateAt,
-      restoreDefaultRoster,
+      clearRoster,
+      triggerExcelImport,
+      onExcelSelected,
       triggerPhotoUploadForIndex,
-      onPhotoSelected
+      onPhotoSelected,
+
+      // Toast Notifications
+      toastMessage,
+      toastType,
+      showToast
     };
   }
 });

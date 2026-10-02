@@ -1,105 +1,109 @@
 # 🎆 Celestial Firework Lucky Draw & VIP Golden Ticket Gala System
-### 星穹烟花与金票盛典年会抽奖系统 · 企业大会级离线抽奖应用
+### 星穹烟花与金票盛典年会抽奖系统 · 企业大会级离线/在线双用抽奖平台
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Vue 3](https://img.shields.io/badge/Vue-3.x%20(Offline)-42b883.svg)](https://vuejs.org/)
-[![Audio](https://img.shields.io/badge/Audio-Web%20Audio%20API-blue.svg)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
-[![Excel](https://img.shields.io/badge/Excel-SheetJS%20Offline-green.svg)](https://sheetjs.com/)
-[![Local-First](https://img.shields.io/badge/Privacy-100%25%20Offline%20Local--First-red.svg)](#privacy)
+[![Live Demo](https://img.shields.io/badge/Demo-Click%20to%20Play%20Online-ff4655?style=for-the-badge&logo=googlechrome&logoColor=white)](https://chenjunwei1230-dotcom.github.io/annual-gala-lucky-draw/)
+[![GitHub stars](https://img.shields.io/github/stars/chenjunwei1230-dotcom/annual-gala-lucky-draw?style=for-the-badge)](https://github.com/chenjunwei1230-dotcom/annual-gala-lucky-draw)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🌟 项目亮点 (Key Highlights)
+## 🌐 在线体验与使用 (Live Online Demo)
 
-- **🎆 60 FPS 物理烟花双重画布引擎 (Pyrotechnic Dual-Canvas Engine)**  
-  独立轨迹层与粒子爆炸层，真实模拟迫击炮点火引信、迫击炮底膛重低音、尖啸升空拖尾（Rocket Ascent）、空中顶点微重力减速与千丝垂柳（Kamuro Willows）重力衰减。
+无需下载安装任何软件，在手机或电脑浏览器中直接点开即可体验完整抽奖与烟花音效：  
+👉 **[https://chenjunwei1230-dotcom.github.io/annual-gala-lucky-draw/](https://chenjunwei1230-dotcom.github.io/annual-gala-lucky-draw/)**
+
+*(支持全屏投屏、快捷键空格抽奖、一键导入 Excel、自定义奖项与票券文案)*
+
+---
+
+## 🌟 效果实拍展示 (Visual Effects & Showcase)
+
+> 💡 **使用前视觉预览**：以下均为系统真实运行 4K/60FPS 画质实拍，让您在部署活动前直观感受每一处舞台特效。
+
+### 1. 🌌 盛典主舞台静置状态 (Live Gala Arena Stage)
+浩瀚星空动态银河光带、悬浮星盘罗盘仪、倒计时状态栏与顶部实时奖项轮播：
+![Stage Arena Idle](docs/screenshots/01_stage_arena_idle.png)
+
+---
+
+### 2. 🎆 60 FPS 物理烟花升空与多级连爆 (Pyrotechnic Fireworks Explosion)
+迫击炮轰鸣发射、火箭尖啸拖尾腾空、千丝垂柳金屑（Kamuro Willows）重力衰减与全屏彩带雨粒子：
+![Fireworks Burst Celebration](docs/screenshots/02_firework_burst_celebration.png)
+
+---
+
+### 3. 🎫 VIP Golden Ticket 奢华金票中奖公布 (方案 B · 底部宽幅横向副券)
+酒红天鹅绒质感底色、防伪冲孔撕票半圆缺口、正向横向官方存根副券、防伪条形码与底部悬浮控制胶囊：
+![Golden Ticket Winner Reveal](docs/screenshots/03_golden_ticket_winner_reveal.png)
+
+---
+
+### 4. ✏️ 现场直接点击文字原地修改 (Inline Live Edit)
+卡片上的活动名、日期、地点、副券标题等均支持鼠标直接点击原地打字修改，失焦自动持久化保存：
+![Live Customized Titles](docs/screenshots/05_live_custom_edited.png)
+
+---
+
+### 5. ⚙️ 奖项配额与金票品牌全局定制面板 (Settings Modal)
+点击底栏 `⚙️` 图标，支持全局批量配置奖品、名额、自定义文案及一键恢复出厂设置：
+![Ticket Settings Modal](docs/screenshots/04_ticket_settings_modal.png)
+
+---
+
+### 6. 📊 候选人名单管理与 Excel/CSV 一键导入导出 (Candidate Manager)
+内置离线版 SheetJS 引擎，无需后端支持，直接拖入 Excel 即可秒级导入数千人名单，支持员工真实头像上传（Base64 转码）：
+| 👥 候选人名册与批量导入 | 🏆 中奖历史记录与 Excel 导出 |
+| :---: | :---: |
+| ![Candidate Roster](docs/screenshots/06_candidate_roster_excel.png) | ![Winners History](docs/screenshots/07_winners_history_export.png) |
+
+---
+
+## 💎 核心技术亮点 (Key Engineering Features)
+
+- **🎆 60 FPS 物理烟花双重画布引擎 (Pyrotechnic Dual-Canvas)**  
+  独立轨迹层与粒子爆炸层，基于 HTML5 Canvas 实现迫击炮点火引信、空气阻力、微重力衰减与多重色谱混合。
   
 - **🔊 Web Audio API 程序化音频合成器 (Zero External Audio Files)**  
-  彻底摆脱 MP3/WAV 音频文件加载慢或跨域问题，纯数学合成算法：粉红噪声引信燃烧声、正弦波下潜迫击炮冲击波、变频振荡器火箭尖啸、及白噪声多级爆鸣。
+  纯数学算法实时合成，彻底告别音频卡顿或版权问题：
+  - 引信燃烧：粉红噪声 + 带通滤波
+  - 迫击炮发射：低频正弦指数下潜
+  - 升空尖啸：变频振荡器高频调制
+  - 爆裂震鸣：白噪声多级衰减冲激
 
-- **🎫 盛典级 VIP Golden Ticket（方案 B · 底部宽幅横向副券）**  
-  酒红天鹅绒底蕴与暗金流光金箔边框，100% 国际化纯英文版式（Cinzel & Playfair Display），底部带有半圆形撕票缺口（Die-cut Notches）的横向副券，官方条形码与安全防伪印章。
-
-- **✏️ 全要素标题实时可编辑 (100% Customizable Ceremony Titles)**  
-  支持**表面直接点击原地修改（Inline Live Edit）**与**底栏 ⚙️ 设置弹窗批量配置**两种模式，自动持久化存储至浏览器本地 `localStorage`，刷新不丢失。
-
-- **🛸 悬浮卫星胶囊坞 (Detached Satellite Capsule Dock)**  
-  主操作按钮移出票券本体，独立悬浮于卡片下方。支持单人抽奖与多人批量抽奖、中奖者保留/移除候选池、快捷键（SPACE 键即时发射与认领）。
-
-- **📊 100% 本地离线与数据隐私安全 (Local-First Architecture)**  
-  内置离线版 SheetJS 引擎，支持直接拖拽 `.xlsx` / `.xls` / `.csv` 名单导入，支持批量文本粘贴同步，支持员工真实头像本地上传（Base64 转码），支持随时将中奖名单导出为标准 Excel 表格。
+- **🔒 100% 离线与企业数据绝对隐私 (Local-First Architecture)**  
+  所有名单、工号、部门与肖像照片均在浏览器本地运算与内存中处理，**绝不上传任何第三方云端或外部服务器**，现场断网依然 100% 稳如磐石。
 
 ---
 
-## 📸 运行效果截图 (Showcase)
+## 🚀 本地离线运行 (Run Offline Locally)
 
-| 🎆 盛典舞台烟花与 VIP Golden Ticket 中奖公布 |
-| :---: |
-| ![VIP Golden Ticket Reveal](firework-edition/live_variant_b_revealed.png) |
+如果您在没有外网的年会保密内网环境中，也可以完全离线运行：
 
-| ⚙️ VIP 票券标题与品牌定制弹窗 | ✏️ 实时自定义标题生效演示 |
-| :---: | :---: |
-| ![Settings Modal](firework-edition/live_ticket_settings_modal.png) | ![Customized Titles](firework-edition/live_variant_b_custom_edited.png) |
+### 方法一：Windows 用户双击一键运行
+直接双击根目录下的 **`start.bat`**，系统将自动启动轻量服务并弹出默认浏览器。
 
----
-
-## 🚀 快速启动 (Quick Start)
-
-本项目为 **100% 纯前端静态 + 轻量服务** 架构，无需配置复杂数据库。
-
-### 方法一：双击一键启动（推荐 Windows 用户）
-直接双击项目根目录下的 **`start.bat`** 或 `firework-edition/start.bat`，脚本将自动启动本地服务并打开浏览器。
-
-### 方法二：命令行启动 (Node.js)
+### 方法二：命令行极简启动
 ```bash
-# 启动内置服务
+# 启动内置静态服务
 node server.js
 
-# 打开浏览器访问：
+# 在浏览器中打开：
 http://localhost:3001
 ```
 
 ---
 
-## 🎮 操作指南与快捷键 (Controls & Shortcuts)
+## 🎮 键盘快捷键 (Keyboard Shortcuts)
 
-- **`SPACE` (空格键)**：点火发射火箭 / 抽取中奖者 / 确认领奖并抽下一位
-- **`M` 键**：一键切换静音 / 开启盛典音效
-- **`F` 键**：一键全屏 / 退出全屏（适合大屏幕与投影仪展播）
-- **点击票券文字**：卡片上的活动名、日期、地点、副券标题等均可直接点击编辑修改
-- **底栏 `⚙️` 图标**：打开奖项配额配置与金票全局文案定制面板
-- **底栏 `👥` 图标**：打开候选人名单抽屉（查看名单、上传照片、导入 Excel）
-- **顶栏 `🏆 Winners` 按钮**：查看已中奖者流水并一键导出为 Excel
-
----
-
-## 📂 项目结构 (Directory Layout)
-
-```
-lucky draw/
-├── firework-edition/           # 🎆 星穹烟花盛典独立完整版
-│   ├── index.html              # 主应用界面 (Vue 3 挂载点)
-│   ├── style.css               # 盛典视觉设计系统与 VIP Golden Ticket 样式
-│   ├── app.js                  # 物理烟花引擎、Web Audio 合成器、状态管理
-│   ├── vue.global.prod.js      # 离线 Vue 3 核心库
-│   ├── xlsx.mini.min.js        # 离线 SheetJS Excel 导入导出库
-│   ├── server.js               # 轻量级本地 HTTP 服务
-│   ├── start.bat               # Windows 一键启动脚本
-│   └── ticket_refinements.html # 票券形态对比与设计原型
-├── requirements.md             # 产品功能规范
-├── architecture.md             # 系统技术架构设计文档
-└── README.md                   # 项目介绍文档
-```
-
----
-
-## 🔒 隐私与离线保证 (Privacy & Local-First)
-
-- **零数据外发**：系统不需要联网即可完整运行，所有名单、工号、照片均在浏览器内存与本地存储中。
-- **免数据库运维**：数据持久化使用浏览器的 `localStorage`，企业会议现场断网依然稳如磐石。
+| 按键 | 功能说明 |
+| :--- | :--- |
+| **`SPACE` (空格键)** | 发射烟花 / 抽取中奖者 / 确认领奖并抽下一位 |
+| **`M` 键** | 一键开启 / 关闭全局背景盛典音效 |
+| **`F` 键** | 一键切换全屏模式（适合大屏幕、投影仪展播） |
+| **`ESC` 键** | 关闭当前打开的抽屉或弹窗 |
 
 ---
 
 ## 📄 授权协议 (License)
 
-本项目采用 [MIT License](LICENSE) 授权许可。
+本项目采用 [MIT License](LICENSE) 开源协议。
